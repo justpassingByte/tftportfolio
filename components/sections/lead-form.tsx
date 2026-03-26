@@ -13,9 +13,10 @@ const ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Maste
 interface LeadFormProps {
   isOpen: boolean;
   onClose: () => void;
+  boosterId?: string;
 }
 
-export default function LeadForm({ isOpen, onClose }: LeadFormProps) {
+export default function LeadForm({ isOpen, onClose, boosterId }: LeadFormProps) {
   const [formData, setFormData] = useState({
     contact: '',
     currentRank: '',
@@ -25,9 +26,28 @@ export default function LeadForm({ isOpen, onClose }: LeadFormProps) {
 
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Form submission logic would go here
+
+    // If boosterId is provided, submit to API; otherwise just mock it
+    if (boosterId) {
+      try {
+        await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            booster_id: boosterId,
+            contact_info: formData.contact,
+            current_rank: formData.currentRank,
+            desired_rank: formData.targetRank,
+            message: formData.message,
+          }),
+        });
+      } catch {
+        // Silently fail for now — will add toast notifications later
+      }
+    }
+
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);

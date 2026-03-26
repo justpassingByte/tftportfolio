@@ -3,61 +3,15 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { defaultProofItems } from '@/lib/default-content';
+import type { ProofItem } from '@/lib/types';
 
-interface ProofItem {
-  id: number;
-  title: string;
-  description: string;
-  tags: string[];
-  size: 'small' | 'medium' | 'large';
+interface ProofSectionProps {
+  items?: ProofItem[];
 }
 
-const proofItems: ProofItem[] = [
-  {
-    id: 1,
-    title: 'Diamond 2 → Master',
-    description: 'Consistent climb in 2 days with stable LP gains',
-    tags: ['Fast 8 meta'],
-    size: 'large',
-  },
-  {
-    id: 2,
-    title: '+180 LP Winstreak',
-    description: 'No losing streaks, pure adaptation',
-    tags: ['Flex playstyle'],
-    size: 'medium',
-  },
-  {
-    id: 3,
-    title: 'Top 0.5% Lobby',
-    description: 'Consistent high-level gameplay',
-    tags: ['Adaptation focus'],
-    size: 'medium',
-  },
-  {
-    id: 4,
-    title: 'Platinum 1 → Master',
-    description: 'Clean 3-day run with zero account risks',
-    tags: ['Economy management'],
-    size: 'large',
-  },
-  {
-    id: 5,
-    title: 'Diamond 4 → Diamond 1',
-    description: 'Fast progression through Diamond',
-    tags: ['Flex playstyle'],
-    size: 'small',
-  },
-  {
-    id: 6,
-    title: 'Master Tier Lock',
-    description: 'Maintained rank with consistent performance',
-    tags: ['Stability'],
-    size: 'medium',
-  },
-];
-
-export default function ProofSection() {
+export default function ProofSection({ items }: ProofSectionProps) {
+  const proofItems = items ?? defaultProofItems;
   const [selectedItem, setSelectedItem] = useState<ProofItem | null>(null);
 
   return (

@@ -1,30 +1,27 @@
 'use client';
 
-export default function PersonalSection() {
+import { defaultPersonalContent } from '@/lib/default-content';
+import type { PersonalContent } from '@/lib/types';
+
+interface PersonalSectionProps {
+  content?: PersonalContent;
+}
+
+export default function PersonalSection({ content }: PersonalSectionProps) {
+  const c = content ?? defaultPersonalContent;
+
   return (
     <section className="py-24 px-4 bg-slate-950">
       <div className="max-w-2xl mx-auto">
         <div className="border-l-4 border-yellow-400 pl-8 py-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            What&apos;s Different
+            {c.title}
           </h2>
 
           <div className="space-y-5 text-slate-300 text-lg leading-relaxed">
-            <p>
-              I don&apos;t run a boosting team. There&apos;s no rotating pool of accounts, no outsourcing, no randomness.
-            </p>
-
-            <p>
-              Every game you climb is played by me. That means consistent playstyle, same decision-making, and full accountability for your account&apos;s progress.
-            </p>
-
-            <p>
-              My focus is on clean climbs. I play careful TFT — proper economy, flex comps, and adaptation to whatever lobby throws at me. No forcing meta, no coinflip plays.
-            </p>
-
-            <p>
-              You get a high-level player who understands the game deeply and treats your account with the same care I&apos;d treat my own.
-            </p>
+            {c.paragraphs.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
           </div>
         </div>
       </div>

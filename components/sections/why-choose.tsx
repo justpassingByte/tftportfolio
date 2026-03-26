@@ -1,27 +1,16 @@
 'use client';
 
 import { Check } from 'lucide-react';
+import { defaultWhyChooseContent } from '@/lib/default-content';
+import type { WhyChooseContent } from '@/lib/types';
 
-const reasons = [
-  {
-    title: 'Same Player Every Game',
-    description: 'No variance. You get consistent playstyle and decision-making from start to finish.',
-  },
-  {
-    title: 'Strong Macro & Economy',
-    description: 'Core TFT skills that separate high-level from middling play. Proper resource management every lobby.',
-  },
-  {
-    title: 'Flexible Comps',
-    description: 'Not forced to one meta. I adapt to lobby and play whatever wins — fast 8, hyperroll, slow roll.',
-  },
-  {
-    title: 'Stable LP Climb',
-    description: 'Consistent progression without risky coinflips. You know what you&apos;re getting.',
-  },
-];
+interface WhyChooseMeProps {
+  content?: WhyChooseContent;
+}
 
-export default function WhyChooseMe() {
+export default function WhyChooseMe({ content }: WhyChooseMeProps) {
+  const c = content ?? defaultWhyChooseContent;
+
   return (
     <section className="py-24 px-4 bg-gradient-to-b from-slate-900/50 to-slate-950 relative">
       {/* Subtle background accent */}
@@ -29,14 +18,14 @@ export default function WhyChooseMe() {
 
       <div className="max-w-4xl mx-auto relative z-10">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center">
-          Why Choose Me
+          {c.title}
         </h2>
         <p className="text-slate-400 text-center mb-16 text-lg">
-          TFT-specific focus on what actually matters
+          {c.subtitle}
         </p>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {reasons.map((reason, index) => (
+          {c.reasons.map((reason, index) => (
             <div
               key={index}
               className="group rounded-lg bg-slate-800/30 border border-slate-700/50 hover:border-blue-500/50 p-6 transition-all duration-300 hover:bg-slate-800/50"

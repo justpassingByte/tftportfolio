@@ -1,65 +1,16 @@
 'use client';
 
 import { Star } from 'lucide-react';
+import { defaultReviews } from '@/lib/default-content';
+import type { ReviewItem } from '@/lib/types';
 
-const reviews = [
-  {
-    id: 1,
-    username: 'SoloQGrinder',
-    before: 'D3',
-    after: 'Master',
-    days: '3 days',
-    review: 'Super smooth climb, no sketchy gameplay. Actually feels like watching a high-level player.',
-    rating: 5,
-  },
-  {
-    id: 2,
-    username: 'TacticsMain',
-    before: 'P1',
-    after: 'Diamond 1',
-    days: '2 weeks',
-    review: 'Fast progression. The guy knows what he&apos;s doing. Consistent LP gains every single day.',
-    rating: 5,
-  },
-  {
-    id: 3,
-    username: 'NewbieClimber',
-    before: 'Gold 1',
-    after: 'Plat 2',
-    days: '10 days',
-    review: 'Clean gameplay. Zero account risks. Would recommend to anyone wanting legit boost.',
-    rating: 5,
-  },
-  {
-    id: 4,
-    username: 'CompNoob',
-    before: 'Diamond 1',
-    after: 'Master',
-    days: '4 days',
-    review: 'The adaptability is unmatched. Never forces a comp, always plays what the lobby needs.',
-    rating: 5,
-  },
-  {
-    id: 5,
-    username: 'RankedWarrior',
-    before: 'Plat 3',
-    after: 'Diamond 2',
-    days: '16 days',
-    review: 'Fast response to messages, professional, no issues. Exactly what I was looking for.',
-    rating: 5,
-  },
-  {
-    id: 6,
-    username: 'MetaChaser',
-    before: 'Diamond 4',
-    after: 'Master',
-    days: '5 days',
-    review: 'Incredible macro decisions. Watched some games and learned a lot just from observation.',
-    rating: 5,
-  },
-];
+interface ReviewsProps {
+  reviews?: ReviewItem[];
+}
 
-export default function Reviews() {
+export default function Reviews({ reviews: reviewsProp }: ReviewsProps) {
+  const reviews = reviewsProp ?? defaultReviews;
+
   return (
     <section className="py-24 px-4 bg-slate-950 relative">
       <div className="absolute inset-0 bg-gradient-to-t from-purple-900/5 via-transparent to-transparent pointer-events-none" />
@@ -94,16 +45,18 @@ export default function Reviews() {
               <div className="mb-4 pb-4 border-b border-slate-700">
                 <p className="text-sm text-slate-400 mb-1">Rank progression</p>
                 <p className="text-lg font-semibold text-white">
-                  <span className="text-slate-300">{review.before}</span>
+                  <span className="text-slate-300">{review.rank_before}</span>
                   <span className="mx-2 text-slate-500">→</span>
-                  <span className="text-purple-300">{review.after}</span>
-                  <span className="ml-3 text-sm text-slate-400">({review.days})</span>
+                  <span className="text-purple-300">{review.rank_after}</span>
+                  {review.days && (
+                    <span className="ml-3 text-sm text-slate-400">({review.days})</span>
+                  )}
                 </p>
               </div>
 
               {/* Review text */}
               <p className="text-slate-300 mb-4 leading-relaxed">
-                &quot;{review.review}&quot;
+                &quot;{review.content}&quot;
               </p>
 
               {/* Username */}
