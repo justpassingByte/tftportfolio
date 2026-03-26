@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Home, Users, FileText, Check, X, Plus, LogOut, ExternalLink } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Home, Users, FileText, Check, X, Plus, LogOut, ExternalLink, Globe, Save } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
-type AdminTab = 'applications' | 'users';
+type AdminTab = 'applications' | 'users' | 'community';
 
 interface Application {
   id: string;
@@ -38,6 +39,9 @@ export default function AdminPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createForm, setCreateForm] = useState({ email: '', password: '', username: '', display_name: '' });
   const [createError, setCreateError] = useState('');
+  // Community settings
+  const [community, setCommunity] = useState({ title: 'Community', description: 'If you want to learn, discuss TFT, or just hang out, feel free to join. Active community focused on high-level gameplay.', link_text: 'Join Discord Server', link_url: '#' });
+  const [communitySaved, setCommunitySaved] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   // Which application is being turned into an account
   const [approvingAppId, setApprovingAppId] = useState<string | null>(null);
@@ -199,6 +203,12 @@ export default function AdminPage() {
             <Users className="w-4 h-4" /> Boosters
             <Badge className="bg-slate-700 text-slate-300 text-[10px] px-1.5 ml-auto">{users.length}</Badge>
           </button>
+          <button
+            onClick={() => setTab('community')}
+            className={cn('flex items-center gap-2.5 px-4 py-2.5 text-sm w-full text-left transition-colors', tab === 'community' ? 'text-white bg-purple-600/20 border-r-2 border-purple-500' : 'text-slate-400 hover:text-white hover:bg-slate-800/50')}
+          >
+            <Globe className="w-4 h-4" /> Community
+          </button>
         </div>
 
         {/* Content */}
@@ -332,6 +342,48 @@ export default function AdminPage() {
                     <p className="text-slate-500">No boosters yet. Create one above or approve an application.</p>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Community Tab ───────────────────────── */}
+          {tab === 'community' && (
+            <div className="max-w-2xl space-y-6">
+              <h2 className="text-xl font-bold text-white">Community Section</h2>
+              <p className="text-sm text-slate-400">Manage the community section shown at the bottom of all landing pages.</p>
+
+              <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-5 space-y-4">
+                <div>
+                  <Label className="text-slate-300 text-sm mb-1.5 block">Title</Label>
+                  <Input value={community.title} onChange={(e) => setCommunity({ ...community, title: e.target.value })} className="bg-slate-800 border-slate-700 text-white" />
+                </div>
+                <div>
+                  <Label className="text-slate-300 text-sm mb-1.5 block">Description</Label>
+                  <Textarea value={community.description} onChange={(e) => setCommunity({ ...community, description: e.target.value })} rows={3} className="bg-slate-800 border-slate-700 text-white resize-none" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-slate-300 text-sm mb-1.5 block">Button Text</Label>
+                    <Input value={community.link_text} onChange={(e) => setCommunity({ ...community, link_text: e.target.value })} className="bg-slate-800 border-slate-700 text-white" />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300 text-sm mb-1.5 block">Button URL</Label>
+                    <Input value={community.link_url} onChange={(e) => setCommunity({ ...community, link_url: e.target.value })} placeholder="https://discord.gg/..." className="bg-slate-800 border-slate-700 text-white" />
+                  </div>
+                </div>
+                <Button size="sm" onClick={() => { setCommunitySaved(true); setTimeout(() => setCommunitySaved(false), 2000); }} className="bg-purple-600 hover:bg-purple-700 text-white h-8 text-xs">
+                  <Save className="w-3 h-3 mr-1" /> {communitySaved ? 'Saved!' : 'Save Changes'}
+                </Button>
+              </div>
+
+              {/* Preview */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-400 mb-3">Preview</h3>
+                <div className="bg-gradient-to-b from-slate-950 to-slate-900/50 rounded-lg p-8 text-center border border-slate-700/50">
+                  <h4 className="text-2xl font-bold text-white mb-3">{community.title}</h4>
+                  <p className="text-slate-400 text-sm mb-5 max-w-md mx-auto">{community.description}</p>
+                  <span className="inline-flex items-center bg-slate-800/50 border border-slate-600 text-white text-sm px-5 py-2 rounded-lg">{community.link_text}</span>
+                </div>
               </div>
             </div>
           )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Palette, Eye, Save, Home, X, Brush, Star, MessageSquare, Settings2, ExternalLink, LogOut, Shield } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -67,6 +67,7 @@ const DEFAULT_BLOCKS: Block[] = [
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
   const [activeTab, setActiveTab] = useState<DashboardTab>('builder');
   const [blocks, setBlocks] = useState<Block[]>(DEFAULT_BLOCKS);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
@@ -76,7 +77,23 @@ export default function DashboardPage() {
   const [isPreview, setIsPreview] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // Auth guard — redirect to /login if not authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/login');
+      } else {
+        setAuthChecked(true);
+      }
+    };
+    checkAuth();
+  }, [router]);
+
   const selectedBlock = blocks.find((b) => b.id === selectedBlockId) ?? null;
+
+
 
   // ── Block operations ──────────────────────────
   const addBlock = useCallback((type: BlockType, afterIndex: number) => {
@@ -116,6 +133,15 @@ export default function DashboardPage() {
     return {};
   })();
   const bgClass = pageSettings.background.type === 'gradient' ? `bg-gradient-to-b ${pageSettings.background.value}` : '';
+
+  // Auth loading guard — placed after all hooks to avoid hooks order violation
+  if (!authChecked) {
+    return (
+      <div className="h-screen bg-slate-950 flex items-center justify-center">
+        <p className="text-slate-500 text-sm">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>
