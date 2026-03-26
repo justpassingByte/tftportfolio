@@ -114,10 +114,16 @@ export async function getBoosterByUsername(
       .from('booster_pages')
       .select('*')
       .eq('user_id', profile.user_id)
-      .eq('is_published', true)
       .single();
 
-    if (!page) return null;
+    // If no page row exists yet, return profile with empty page data
+    const pageData = page ?? {
+      id: 'default',
+      user_id: profile.user_id,
+      blocks: [],
+      page_settings: {},
+      is_published: false,
+    };
 
     const { data: reviews } = await supabase
       .from('reviews')
@@ -128,7 +134,7 @@ export async function getBoosterByUsername(
 
     return {
       profile,
-      page,
+      page: pageData,
       sections: [],
       proof_items: [],
       reviews: reviews ?? [],

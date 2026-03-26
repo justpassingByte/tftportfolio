@@ -43,20 +43,38 @@ export default function AdminPage() {
   const [approvingAppId, setApprovingAppId] = useState<string | null>(null);
   const router = useRouter();
 
+  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState('');
+
   const loadData = useCallback(async () => {
     const supabase = createClient();
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push('/login'); return; }
 
-    const { data: role } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single();
-    if (!role || role.role !== 'admin') { router.push('/dashboard'); return; }
+    const { data: role, error: roleError } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single();
+    
+    if (roleError) {
+      console.error('Role query error:', roleError);
+      setAuthError(`Role check failed: ${roleError.message}. Run the 002_fix_admin_rls.sql migration.`);
+      setLoading(false);
+      return;
+    }
 
-    const { data: apps } = await supabase.from('booster_applications').select('*').order('created_at', { ascending: false });
+    if (!role || role.role !== 'admin') { 
+      router.push('/dashboard'); 
+      return; 
+    }
+
+    const { data: apps, error: appsError } = await supabase.from('booster_applications').select('*').order('created_at', { ascending: false });
+    if (appsError) console.error('Applications query error:', appsError);
     if (apps) setApplications(apps);
 
-    const { data: boosterUsers } = await supabase.from('booster_profiles').select('*').order('created_at', { ascending: false });
+    const { data: boosterUsers, error: usersError } = await supabase.from('booster_profiles').select('*').order('created_at', { ascending: false });
+    if (usersError) console.error('Users query error:', usersError);
     if (boosterUsers) setUsers(boosterUsers);
+    
+    setLoading(false);
   }, [router]);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -123,6 +141,26 @@ export default function AdminPage() {
   const processedApps = applications.filter((a) => a.status !== 'pending');
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  if (authError) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center max-w-lg">
+          <p className="text-red-400 font-semibold mb-2">Admin Access Error</p>
+          <p className="text-slate-400 text-sm mb-4">{authError}</p>
+          <p className="text-slate-500 text-xs">Run <code className="bg-slate-800 px-1.5 py-0.5 rounded">supabase/migrations/002_fix_admin_rls.sql</code> in your Supabase SQL Editor.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-slate-500 text-sm">Loading admin panel...</p>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     await adminClient.from('booster_pages').insert({
       user_id: userId,
       blocks: [],
-      is_published: false,
+      is_published: true,
     });
 
     return NextResponse.json({ success: true, user_id: userId });
