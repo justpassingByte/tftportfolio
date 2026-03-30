@@ -1,25 +1,32 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 
 interface NavbarProps {
   displayName: string;
+  activeSections?: string[];
+  contactLinks?: { discord?: string; telegram?: string; custom?: string; discord_server?: string };
 }
 
-export default function Navbar({ displayName }: NavbarProps) {
+export default function Navbar({ displayName, activeSections, contactLinks }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { locale, t, toggleLocale } = useI18n();
 
-  const navLinks = [
-    { label: t.nav.about, href: '#about_avatar' },
-    { label: t.nav.difference, href: '#comparison' },
-    { label: t.nav.results, href: '#proof' },
-    { label: t.nav.gallery, href: '#gallery' },
-    { label: t.nav.reviews, href: '#reviews' },
+  const allNavLinks = [
+    { id: 'about_avatar', label: t.nav.about, href: '#about_avatar' },
+    { id: 'comparison', label: t.nav.difference, href: '#comparison' },
+    { id: 'proof', label: t.nav.results, href: '#proof' },
+    { id: 'gallery', label: t.nav.gallery, href: '#gallery' },
+    { id: 'reviews', label: t.nav.reviews, href: '#reviews' },
   ];
+
+  // Only show links for sections that are actually loaded on the page
+  const navLinks = activeSections 
+    ? allNavLinks.filter(link => activeSections.includes(link.id))
+    : allNavLinks;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/50 shadow-sm">
@@ -39,32 +46,63 @@ export default function Navbar({ displayName }: NavbarProps) {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1 border border-slate-700/50 bg-slate-800/50 p-1 rounded-lg backdrop-blur-sm">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-slate-300 hover:text-purple-400 text-sm font-medium transition-colors"
+                className="px-4 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-all duration-200"
                 onClick={(e) => {
                   e.preventDefault();
                   document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
+                  window.history.pushState(null, '', link.href);
                 }}
               >
                 {link.label}
               </a>
             ))}
+            
+            {/* Always map Community in the menu list */}
+            <a
+              href="#community"
+              className="px-4 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-all duration-200"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#community')?.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState(null, '', '#community');
+              }}
+            >
+              {t.nav.community || 'Community'}
+            </a>
           </div>
 
           {/* Right side: Language toggle + Login */}
-          <div className="hidden md:flex items-center gap-2">
-            <button
-              onClick={toggleLocale}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors border border-slate-700/50"
-              title={locale === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              {locale === 'vi' ? 'EN' : 'VI'}
-            </button>
+          <div className="hidden md:flex items-center gap-3">
+            
+            {/* Language Selection Segmented Control */}
+            <div className="flex items-center bg-slate-800/80 rounded-lg p-1 border border-slate-700/50">
+              <button
+                onClick={() => locale !== 'vi' && toggleLocale('vi')}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                  locale === 'vi' 
+                    ? 'bg-purple-600 text-white shadow-sm' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                }`}
+              >
+                VN
+              </button>
+              <button
+                onClick={() => locale !== 'en' && toggleLocale('en')}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                  locale === 'en' 
+                    ? 'bg-purple-600 text-white shadow-sm' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                }`}
+              >
+                EN
+              </button>
+            </div>
+            
             <Link
               href="/login"
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-slate-800 hover:bg-slate-700 hover:text-purple-300 border-slate-700 transition-colors shadow-sm"
@@ -76,7 +114,7 @@ export default function Navbar({ displayName }: NavbarProps) {
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden gap-2">
             <button
-              onClick={toggleLocale}
+              onClick={() => toggleLocale()}
               className="text-slate-300 hover:text-white px-2 py-1 rounded border border-slate-700/50 text-xs font-medium"
             >
               {locale === 'vi' ? 'EN' : 'VI'}
@@ -105,6 +143,7 @@ export default function Navbar({ displayName }: NavbarProps) {
                   e.preventDefault();
                   setIsMobileMenuOpen(false);
                   document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
+                  window.history.pushState(null, '', link.href);
                 }}
               >
                 {link.label}

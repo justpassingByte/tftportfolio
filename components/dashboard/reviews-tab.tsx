@@ -56,10 +56,13 @@ export default function ReviewsTab({ userId }: ReviewsTabProps) {
   };
 
   const deleteReview = async (id: string) => {
-    const supabase = createClient();
-    const { error } = await supabase.from('reviews').delete().eq('id', id);
-    if (!error) {
+    if (!window.confirm('Bạn có chắc chắn muốn xoá đánh giá này? Dữ liệu sẽ bị xoá vĩnh viễn và không thể khôi phục.')) return;
+    
+    const res = await fetch(`/api/reviews?id=${id}`, { method: 'DELETE' });
+    if (res.ok) {
       setReviews(reviews.filter((r) => r.id !== id));
+    } else {
+      alert('Không thể xoá đánh giá. Vui lòng thử lại.');
     }
   };
 

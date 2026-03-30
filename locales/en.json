@@ -2,9 +2,10 @@
   "nav": {
     "about": "About",
     "difference": "Difference",
-    "results": "Results",
+    "results": "Achievement",
     "gallery": "Gallery",
     "reviews": "Reviews",
+    "community": "Community",
     "dashboard_login": "Dashboard Login"
   },
   "hero": {
@@ -32,7 +33,17 @@
   },
   "reviews": {
     "title": "What Players Say",
-    "subtitle": "Real feedback from real rank climbs"
+    "subtitle": "Real feedback from real rank climbs",
+    "badge": "Trusted by players across all ranks",
+    "write_review": "Write a Review",
+    "no_reviews": "No reviews yet",
+    "no_reviews_desc": "Be the first to leave a review for this service!",
+    "happy_clients": "Happy Clients",
+    "avg_rating": "Avg Rating",
+    "satisfaction": "Satisfaction",
+    "verified_client": "Verified Client",
+    "rank_journey": "Rank Journey",
+    "duration": "Duration"
   },
   "community": {
     "title": "Connect & Tournaments",
@@ -45,12 +56,43 @@
     "cta": "Get Your Portfolio"
   },
   "lead_form": {
-    "title": "Interested?",
+    "title": "Tell me your goal",
     "subtitle": "If you don't have time to grind or want to watch a pro play to learn, hire me.",
+    "contact": "Discord or Telegram",
+    "contact_placeholder": "your_username#1234",
+    "current_rank": "Current rank",
+    "current_rank_placeholder": "Select your rank",
+    "target_rank": "Target rank",
+    "target_rank_placeholder": "Where do you want to go?",
+    "message": "Anything else?",
+    "message_placeholder": "Tell me about your playstyle or any concerns...",
+    "tagline": "Tell me your goal, I'll handle the rest.",
+    "submit": "Send message",
+    "submitting": "Sending...",
+    "success_title": "Message received!",
+    "success_desc": "I'll check your info and get back to you fast.",
+    "error": "Something went wrong. Please try again."
+  },
+  "review_form": {
+    "title": "Leave a Review",
+    "subtitle": "Share your experience after using this service.",
     "name": "Your name",
-    "rank": "Current rank",
-    "message": "Message",
-    "submit": "Send request"
+    "name_placeholder": "e.g. Player123",
+    "server": "Server",
+    "server_placeholder": "Select server",
+    "rating": "Star rating",
+    "rank_before": "Rank before service",
+    "rank_before_placeholder": "e.g. Emerald 4",
+    "rank_after": "Current rank",
+    "rank_after_placeholder": "e.g. Master",
+    "content": "Your review",
+    "content_placeholder": "Were you satisfied? Was the booster clean?",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "success_title": "Submitted!",
+    "success_desc": "Your review has been sent to the booster for approval before being displayed.",
+    "close": "Close",
+    "error": "Something went wrong. Please try again."
   },
   "partner_form": {
     "title": "Partner with Tacticianclimb",
@@ -65,5 +107,27 @@
   "gallery": {
     "title": "Achievements & Activities",
     "subtitle": "Real screenshots from gameplay, community, and development"
+  },
+  "dashboard": {
+    "page_builder": "Page Builder",
+    "reviews": "Reviews",
+    "leads": "Leads",
+    "settings": "Settings",
+    "applications": "Applications",
+    "boosters": "Boosters",
+    "community": "Community",
+    "admin_panel": "Admin Panel",
+    "preview": "Preview",
+    "editing": "Editing",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Saved!",
+    "view_live": "View page",
+    "logout": "Log out",
+    "fixed_label": "Fixed"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about our services."
   }
 }

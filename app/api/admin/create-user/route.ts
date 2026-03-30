@@ -87,13 +87,35 @@ export async function POST(request: Request) {
       role: 'booster',
     });
 
-    // 4. Create page with full starter template (same layout as homepage)
+    // 4. Create page: Clone exactly from the Admin's current page
+    const { data: adminPage } = await adminClient
+      .from('booster_pages')
+      .select('blocks, blocks_en, theme_config')
+      .eq('user_id', user.id) // user.id is the admin caller
+      .single();
+
+    let newBlocks = adminPage?.blocks ? structuredClone(adminPage.blocks) : getStarterBlocks(display_name);
+    let newBlocksEn = adminPage?.blocks_en ? structuredClone(adminPage.blocks_en) : [];
+    let newThemeConfig = adminPage?.theme_config || { accentColor: '#6d28d9' };
+
+    const injectAvatar = (blockArray: any[]) => {
+      if (!Array.isArray(blockArray)) return;
+      const heroBlock = blockArray.find(b => b.type === 'hero');
+      if (heroBlock && heroBlock.content) {
+        heroBlock.content.avatar_initial = display_name.charAt(0).toUpperCase();
+        heroBlock.content.avatar_url = ''; // clear admin's avatar photo
+      }
+    };
+
+    injectAvatar(newBlocks);
+    injectAvatar(newBlocksEn);
+
     await adminClient.from('booster_pages').insert({
       user_id: userId,
       template_id: 'default',
-      theme_config: { accentColor: '#6d28d9' },
-      blocks: getStarterBlocks(display_name),
-      blocks_en: [],
+      theme_config: newThemeConfig,
+      blocks: newBlocks,
+      blocks_en: newBlocksEn,
       is_published: true,
     });
 

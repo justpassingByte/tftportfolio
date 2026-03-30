@@ -9,6 +9,8 @@ interface AboutWithAvatarProps {
   avatarAlt?: string;
   highlights?: { icon: string; label: string; value: string }[];
   secondaryImageUrl?: string;
+  missionStatement?: string;
+  missionAuthor?: string;
 }
 
 export default function AboutWithAvatar({
@@ -18,6 +20,8 @@ export default function AboutWithAvatar({
   avatarAlt = 'Profile avatar',
   highlights,
   secondaryImageUrl,
+  missionStatement,
+  missionAuthor,
 }: AboutWithAvatarProps) {
   return (
     <section className="py-24 px-4 bg-slate-950 relative overflow-hidden">
@@ -106,14 +110,18 @@ export default function AboutWithAvatar({
             <div className="mt-10 h-px bg-gradient-to-r from-purple-500/50 via-blue-500/30 to-transparent" />
 
             {/* Mission statement */}
-            <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-purple-600/10 to-blue-600/5 border border-purple-500/20">
-              <p className="text-purple-200 italic text-base leading-relaxed">
-                &ldquo;Mục tiêu của mình là xây dựng một cộng đồng TFT Việt Nam mạnh mẽ, nơi mà
-                các booster có thể hợp tác, chia sẻ kiến thức, và cùng nhau phát triển.
-                Tacticianclimb là nền tảng để biến điều đó thành hiện thực.&rdquo;
-              </p>
-              <p className="text-slate-500 text-sm mt-3">— ngusitink, Founder</p>
-            </div>
+            {(missionStatement || missionAuthor) && (
+              <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-purple-600/10 to-blue-600/5 border border-purple-500/20">
+                {missionStatement && (
+                  <p className="text-purple-200 italic text-base leading-relaxed">
+                    &ldquo;{missionStatement}&rdquo;
+                  </p>
+                )}
+                {missionAuthor && (
+                  <p className="text-slate-500 text-sm mt-3">— {missionAuthor}</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import type { Block, BlockStyle } from '@/lib/block-types';
 import { cn } from '@/lib/utils';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 interface BlockSettingsPanelProps {
   block: Block | null;
@@ -71,19 +72,23 @@ import { useState as __import_useState } from 'react';
 // ================================================================
 // Content Editor — dynamic per block type
 // ================================================================
+
 function ContentEditor({ block, content: c, update }: { block: Block; content: Record<string, unknown>; update: (key: string, value: unknown) => void }) {
   return (
     <>
       {block.type === 'hero' && (
         <>
-          <Field label="Headline" value={c.headline as string} onChange={(v) => update('headline', v)} />
-          <Field label="Highlight" value={c.headline_highlight as string} onChange={(v) => update('headline_highlight', v)} />
-          <Field label="Subheadline" value={c.subheadline as string} onChange={(v) => update('subheadline', v)} />
-          <Field label="Avatar Letter" value={c.avatar_initial as string} onChange={(v) => update('avatar_initial', v)} />
-          <Field label="Avatar Image URL (Optional)" value={(c.avatar_url as string) ?? ''} onChange={(v) => update('avatar_url', v)} placeholder="https://..." />
-          <Field label="CTA Primary" value={c.cta_primary as string} onChange={(v) => update('cta_primary', v)} />
-          <Field label="CTA Secondary" value={c.cta_secondary as string} onChange={(v) => update('cta_secondary', v)} />
-          <Field label="Background Image URL" value={(c.bg_image as string) ?? ''} onChange={(v) => update('bg_image', v)} placeholder="https://..." />
+          <Field label="Headline" value={(c.headline as string) ?? ''} onChange={(v) => update('headline', v)} />
+          <Field label="Headline Highlight" value={(c.headline_highlight as string) ?? ''} onChange={(v) => update('headline_highlight', v)} />
+          <Field label="Subheadline" value={(c.subheadline as string) ?? ''} onChange={(v) => update('subheadline', v)} />
+          <Field label="Purple Button Text" value={(c.cta_tertiary as string) ?? ''} onChange={(v) => update('cta_tertiary', v)} />
+          <Field label="Outline Button Text" value={(c.cta_primary as string) ?? ''} onChange={(v) => update('cta_primary', v)} />
+          <ImageField label="Right Image URL" value={(c.bg_image as string) ?? ''} onChange={(v) => update('bg_image', v)} placeholder="https://..." />
+          <Field 
+            label="Top Tags (comma separated)" 
+            value={((c.trust_badges as string[]) || []).join(', ')} 
+            onChange={(v) => update('trust_badges', v.split(',').map((s) => s.trim()).filter(Boolean))} 
+          />
         </>
       )}
 
@@ -102,7 +107,7 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
 
       {block.type === 'image' && (
         <>
-          <Field label="Image URL" value={(c.src as string) ?? ''} onChange={(v) => update('src', v)} placeholder="Paste URL" />
+          <ImageField label="Image URL" value={(c.src as string) ?? ''} onChange={(v) => update('src', v)} placeholder="Paste URL" />
           <Field label="Caption" value={(c.caption as string) ?? ''} onChange={(v) => update('caption', v)} />
         </>
       )}
@@ -112,9 +117,11 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
           <SelectField label="Columns" value={String((c.columns as number) ?? 3)} options={['2', '3', '4']} onChange={(v) => update('columns', parseInt(v))} />
           <Label className="text-slate-300 block text-xs">Images (URLs)</Label>
           {((c.images as string[]) ?? []).map((img: string, i: number) => (
-            <div key={i} className="flex gap-1">
-              <Input value={img} onChange={(e) => { const a = [...((c.images as string[]) ?? [])]; a[i] = e.target.value; update('images', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="URL" />
-              <button onClick={() => { const a = [...((c.images as string[]) ?? [])]; a.splice(i, 1); update('images', a); }} className="text-red-400 hover:text-red-300 px-1 text-xs">✕</button>
+            <div key={i} className="flex gap-1 mb-2">
+              <div className="flex-1">
+                <ImageUpload value={img} onChange={(v) => { const a = [...((c.images as string[]) ?? [])]; a[i] = v; update('images', a); }} placeholder="URL" />
+              </div>
+              <button onClick={() => { const a = [...((c.images as string[]) ?? [])]; a.splice(i, 1); update('images', a); }} className="text-red-400 hover:text-red-300 px-1 text-xs self-start mt-2">✕</button>
             </div>
           ))}
           <AddBtn onClick={() => update('images', [...((c.images as string[]) ?? []), ''])} label="image" />
@@ -244,8 +251,17 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
       {block.type === 'about_avatar' && (
         <>
           <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
-          <Field label="Avatar Image URL" value={(c.avatarUrl as string) ?? ''} onChange={(v) => update('avatarUrl', v)} placeholder="https://..." />
+          <ImageField label="Avatar Image URL" value={(c.avatarUrl as string) ?? ''} onChange={(v) => update('avatarUrl', v)} placeholder="https://..." />
           <Field label="Avatar Alt Text" value={(c.avatarAlt as string) ?? ''} onChange={(v) => update('avatarAlt', v)} />
+          <Label className="text-slate-300 block text-xs mt-3">Mission Statement</Label>
+          <Textarea 
+            value={(c.missionStatement as string) ?? ''} 
+            onChange={(e) => update('missionStatement', e.target.value)} 
+            className="bg-slate-800 border-slate-700 text-white text-sm resize-none mb-3" 
+            rows={4} 
+          />
+          <Field label="Mission Author" value={(c.missionAuthor as string) ?? ''} onChange={(v) => update('missionAuthor', v)} />
+          <Label className="text-slate-300 block text-xs mt-3">Paragraphs</Label>
           {((c.paragraphs as string[]) ?? ['']).map((p: string, i: number) => (
             <div key={i} className="flex gap-1">
               <Textarea value={p} onChange={(e) => { const a = [...((c.paragraphs as string[]) ?? [''])]; a[i] = e.target.value; update('paragraphs', a); }} className="bg-slate-800 border-slate-700 text-white text-sm resize-none flex-1" rows={2} />
@@ -272,6 +288,10 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
         <>
           <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
           <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Field label="Left Column Title (Old)" value={(c.old_label as string) ?? 'Web Boosting Truyền Thống'} onChange={(v) => update('old_label', v)} />
+          <Field label="Left Column Subtitle (Old)" value={(c.old_sublabel as string) ?? 'Mô hình lạc hậu từ 2012'} onChange={(v) => update('old_sublabel', v)} />
+          <Field label="Right Column Title (New)" value={(c.new_label as string) ?? 'Tacticianclimb'} onChange={(v) => update('new_label', v)} />
+          <Field label="Right Column Subtitle (New)" value={(c.new_sublabel as string) ?? 'Hệ sinh thái cộng đồng mới'} onChange={(v) => update('new_sublabel', v)} />
           <Label className="text-slate-300 block text-xs mt-2">Comparison Items</Label>
           {((c.items as { feature: string; oldWay: string; newWay: string }[]) ?? []).map((item, i) => (
             <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
@@ -297,11 +317,13 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
               <Input value={(item.tags ?? []).join(', ')} onChange={(e) => { const a = [...((c.items as any[]) ?? [])]; a[i] = { ...a[i], tags: e.target.value.split(',').map((t: string) => t.trim()).filter(Boolean) }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Tags (comma separated)" />
               <SelectField label="Size" value={item.size ?? 'small'} options={['small', 'medium', 'large']} onChange={(v) => { const a = [...((c.items as any[]) ?? [])]; a[i] = { ...a[i], size: v }; update('items', a); }} />
               
-              <Label className="text-slate-400 block text-[10px] mt-1">Images (URLs)</Label>
+              <Label className="text-slate-400 block text-[10px] mt-1 mb-1">Images (URLs)</Label>
               {(item.images ?? []).map((img: string, imgIdx: number) => (
-                <div key={imgIdx} className="flex gap-1">
-                  <Input value={img} onChange={(e) => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? [])]; imgs[imgIdx] = e.target.value; a[i] = { ...a[i], images: imgs }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="https://..." />
-                  <button onClick={() => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? [])]; imgs.splice(imgIdx, 1); a[i] = { ...a[i], images: imgs }; update('items', a); }} className="text-red-400 hover:text-red-300 px-1 text-xs">✕</button>
+                <div key={imgIdx} className="flex gap-1 mb-2">
+                  <div className="flex-1">
+                    <ImageUpload value={img} onChange={(v) => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? [])]; imgs[imgIdx] = v; a[i] = { ...a[i], images: imgs }; update('items', a); }} placeholder="https://..." />
+                  </div>
+                  <button onClick={() => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? [])]; imgs.splice(imgIdx, 1); a[i] = { ...a[i], images: imgs }; update('items', a); }} className="text-red-400 hover:text-red-300 px-1 text-xs self-start mt-2">✕</button>
                 </div>
               ))}
               <button onClick={() => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? []), '']; a[i] = { ...a[i], images: imgs }; update('items', a); }} className="text-purple-400 hover:text-purple-300 text-xs">+ Add image</button>
@@ -317,9 +339,11 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
         <>
           <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
           <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
-          <Field label="Image URL" value={(c.image_src as string) ?? ''} onChange={(v) => update('image_src', v)} placeholder="https://..." />
-          <Field label="CTA Text" value={(c.cta_text as string) ?? 'Join Discord'} onChange={(v) => update('cta_text', v)} />
-          <Field label="CTA URL" value={(c.cta_url as string) ?? '#'} onChange={(v) => update('cta_url', v)} />
+          <ImageField label="Image URL" value={(c.image_src as string) ?? ''} onChange={(v) => update('image_src', v)} placeholder="https://..." />
+          <Field label="Discord CTA Text" value={(c.cta_text as string) ?? 'Join Discord'} onChange={(v) => update('cta_text', v)} />
+          <Field label="Discord URL" value={(c.cta_url as string) ?? '#'} onChange={(v) => update('cta_url', v)} />
+          <Field label="Testictour CTA Text" value={(c.testictour_text as string) ?? 'Join Testictour Platform'} onChange={(v) => update('testictour_text', v)} />
+          <Field label="Testictour URL" value={(c.testictour_url as string) ?? ''} onChange={(v) => update('testictour_url', v)} placeholder="https://testictour.com/..." />
           <Label className="text-slate-300 block text-xs mt-2">Stats</Label>
           {((c.stats as { label: string; value: string }[]) ?? []).map((s, i) => (
             <div key={i} className="flex gap-1.5">
@@ -346,6 +370,80 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
             </div>
           ))}
           <AddBtn onClick={() => update('platforms', [...((c.platforms as { name: string; url: string; icon_url: string }[]) ?? []), { name: 'Platform', url: '#', icon_url: '' }])} label="platform" />
+        </>
+      )}
+
+      {block.type === 'donation' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Label className="text-slate-300 block text-xs mt-2">Methods</Label>
+          {((c.methods as { platform: string; detail: string; url: string; qr_url?: string }[]) ?? []).map((m, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <Input value={m.platform} onChange={(e) => { const a = [...((c.methods as { platform: string; detail: string; url: string; qr_url: string }[]) ?? [])]; a[i] = { ...a[i], platform: e.target.value }; update('methods', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Platform (e.g. PayPal)" />
+              <Input value={m.detail} onChange={(e) => { const a = [...((c.methods as { platform: string; detail: string; url: string; qr_url: string }[]) ?? [])]; a[i] = { ...a[i], detail: e.target.value }; update('methods', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Detail (Account #, username...)" />
+              <Input value={m.url} onChange={(e) => { const a = [...((c.methods as { platform: string; detail: string; url: string; qr_url: string }[]) ?? [])]; a[i] = { ...a[i], url: e.target.value }; update('methods', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="URL (Optional)" />
+              <ImageUpload value={m.qr_url as string ?? ''} onChange={(v) => { const a = [...((c.methods as { platform: string; detail: string; url: string; qr_url: string }[]) ?? [])]; a[i] = { ...a[i], qr_url: v }; update('methods', a); }} placeholder="QR Image URL (Optional)" />
+              <button onClick={() => { const a = [...((c.methods as { platform: string; detail: string; url: string; qr_url: string }[]) ?? [])]; a.splice(i, 1); update('methods', a); }} className="text-red-400 hover:text-red-300 text-xs mt-1">Remove</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('methods', [...((c.methods as { platform: string; detail: string; url: string; qr_url: string }[]) ?? []), { platform: 'Platform', detail: 'Detail', url: '', qr_url: '' }])} label="method" />
+        </>
+      )}
+
+      {block.type === 'video' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Field label="Video URL (YouTube/Twitch/Vimeo embed)" value={(c.video_url as string) ?? ''} onChange={(v) => update('video_url', v)} placeholder="https://www.youtube.com/embed/..." />
+          <ImageField label="Custom Thumbnail Image (Optional)" value={(c.thumbnail_url as string) ?? ''} onChange={(v) => update('thumbnail_url', v)} placeholder="https://..." />
+        </>
+      )}
+
+      {block.type === 'pricing' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Label className="text-slate-300 block text-xs mt-2">Plans</Label>
+          {((c.plans as any[]) ?? []).map((p, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <div className="flex gap-1.5">
+                <Input value={p.name} onChange={(e) => { const a = [...((c.plans as any[]) ?? [])]; a[i] = { ...a[i], name: e.target.value }; update('plans', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Plan Name" />
+                <Input value={p.price} onChange={(e) => { const a = [...((c.plans as any[]) ?? [])]; a[i] = { ...a[i], price: e.target.value }; update('plans', a); }} className="bg-slate-800 border-slate-700 text-white text-xs w-20" placeholder="Price" />
+              </div>
+              <Input value={p.description} onChange={(e) => { const a = [...((c.plans as any[]) ?? [])]; a[i] = { ...a[i], description: e.target.value }; update('plans', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Description" />
+              <Textarea value={p.features} onChange={(e) => { const a = [...((c.plans as any[]) ?? [])]; a[i] = { ...a[i], features: e.target.value }; update('plans', a); }} className="bg-slate-800 border-slate-700 text-white text-xs resize-none" rows={2} placeholder="Features (comma separated)" />
+              <div className="flex gap-1.5">
+                <Input value={p.button_text} onChange={(e) => { const a = [...((c.plans as any[]) ?? [])]; a[i] = { ...a[i], button_text: e.target.value }; update('plans', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Button text" />
+                <Input value={p.button_url} onChange={(e) => { const a = [...((c.plans as any[]) ?? [])]; a[i] = { ...a[i], button_url: e.target.value }; update('plans', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Button URL" />
+              </div>
+              <label className="flex items-center gap-2 text-xs text-slate-300">
+                <input type="checkbox" checked={p.is_popular} onChange={(e) => { const a = [...((c.plans as any[]) ?? [])]; a[i] = { ...a[i], is_popular: e.target.checked }; update('plans', a); }} className="rounded border-slate-700 bg-slate-800" />
+                Highlight as Popular
+              </label>
+              <button onClick={() => { const a = [...((c.plans as any[]) ?? [])]; a.splice(i, 1); update('plans', a); }} className="text-red-400 hover:text-red-300 text-xs mt-1">Remove</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('plans', [...((c.plans as any[]) ?? []), { name: 'New Plan', price: '0', description: '', features: '', button_text: 'Choose', button_url: '#', is_popular: false }])} label="plan" />
+        </>
+      )}
+
+      {block.type === 'timeline' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Label className="text-slate-300 block text-xs mt-2">Events</Label>
+          {((c.events as any[]) ?? []).map((e, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <div className="flex gap-1.5">
+                <Input value={e.year} onChange={(ev) => { const a = [...((c.events as any[]) ?? [])]; a[i] = { ...a[i], year: ev.target.value }; update('events', a); }} className="bg-slate-800 border-slate-700 text-white text-xs w-20" placeholder="Year" />
+                <Input value={e.title} onChange={(ev) => { const a = [...((c.events as any[]) ?? [])]; a[i] = { ...a[i], title: ev.target.value }; update('events', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Title" />
+              </div>
+              <Textarea value={e.description} onChange={(ev) => { const a = [...((c.events as any[]) ?? [])]; a[i] = { ...a[i], description: ev.target.value }; update('events', a); }} className="bg-slate-800 border-slate-700 text-white text-xs resize-none" rows={2} placeholder="Description" />
+              <button onClick={() => { const a = [...((c.events as any[]) ?? [])]; a.splice(i, 1); update('events', a); }} className="text-red-400 hover:text-red-300 text-xs mt-1">Remove</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('events', [...((c.events as any[]) ?? []), { year: '2024', title: 'Milestone', description: '' }])} label="event" />
         </>
       )}
     </>
@@ -379,6 +477,15 @@ function Field({ label, value, onChange, placeholder }: { label: string; value: 
     <div>
       <Label className="text-slate-300 mb-1 block text-xs">{label}</Label>
       <Input value={value ?? ''} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="bg-slate-800 border-slate-700 text-white text-sm" />
+    </div>
+  );
+}
+
+function ImageField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <div>
+      <Label className="text-slate-300 mb-1 block text-xs">{label}</Label>
+      <ImageUpload value={value ?? ''} onChange={onChange} placeholder={placeholder} />
     </div>
   );
 }

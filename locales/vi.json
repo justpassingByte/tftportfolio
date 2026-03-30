@@ -5,6 +5,7 @@
     "results": "Thành tích",
     "gallery": "Thư viện",
     "reviews": "Đánh giá",
+    "community": "Cộng đồng",
     "dashboard_login": "Đăng nhập Dashboard"
   },
   "hero": {
@@ -32,7 +33,17 @@
   },
   "reviews": {
     "title": "Người Chơi Nói Gì",
-    "subtitle": "Feedback thật từ những lần leo rank thật"
+    "subtitle": "Feedback thật từ những lần leo rank thật",
+    "badge": "Được tin tưởng bởi mọi rank",
+    "write_review": "Viết Đánh Giá",
+    "no_reviews": "Chưa có đánh giá nào",
+    "no_reviews_desc": "Hãy là người đầu tiên để lại nhận xét với dịch vụ này!",
+    "happy_clients": "Khách Hàng",
+    "avg_rating": "Điểm TB",
+    "satisfaction": "Hài Lòng",
+    "verified_client": "Khách hàng xác thực",
+    "rank_journey": "Hành Trình Rank",
+    "duration": "Thời gian"
   },
   "community": {
     "title": "Giao Lưu & Giải Đấu",
@@ -45,12 +56,43 @@
     "cta": "Đăng ký nhận Portfolio"
   },
   "lead_form": {
-    "title": "Bạn quan tâm?",
+    "title": "Cho tôi biết mục tiêu của bạn",
     "subtitle": "Nếu bạn không có thời gian cày game hoặc muốn xem pro chơi để học hỏi, hãy thuê tôi.",
+    "contact": "Discord hoặc Telegram",
+    "contact_placeholder": "your_username#1234",
+    "current_rank": "Rank hiện tại",
+    "current_rank_placeholder": "Chọn rank của bạn",
+    "target_rank": "Rank mong muốn",
+    "target_rank_placeholder": "Bạn muốn lên rank nào?",
+    "message": "Ghi chú thêm",
+    "message_placeholder": "Cho tôi biết về phong cách chơi hoặc lo ngại...",
+    "tagline": "Cho tôi biết mục tiêu, tôi sẽ lo phần còn lại.",
+    "submit": "Gửi yêu cầu",
+    "submitting": "Đang gửi...",
+    "success_title": "Đã nhận tin nhắn!",
+    "success_desc": "Tôi sẽ kiểm tra thông tin và liên hệ bạn sớm nhất.",
+    "error": "Có lỗi xảy ra. Vui lòng thử lại."
+  },
+  "review_form": {
+    "title": "Để lại Đánh giá",
+    "subtitle": "Chia sẻ trải nghiệm của bạn sau khi sử dụng dịch vụ.",
     "name": "Tên của bạn",
-    "rank": "Rank hiện tại",
-    "message": "Tin nhắn",
-    "submit": "Gửi yêu cầu"
+    "name_placeholder": "Ví dụ: Player123",
+    "server": "Server",
+    "server_placeholder": "Chọn server",
+    "rating": "Đánh giá sao",
+    "rank_before": "Rank trước khi thuê",
+    "rank_before_placeholder": "Ví dụ: Lục Bảo 4",
+    "rank_after": "Rank hiện tại",
+    "rank_after_placeholder": "Ví dụ: Cao Thủ",
+    "content": "Nhận xét của bạn",
+    "content_placeholder": "Bạn hài lòng với dịch vụ chứ? Booster chơi có clean không?",
+    "submit": "Gửi Đánh giá",
+    "submitting": "Đang gửi...",
+    "success_title": "Gửi thành công!",
+    "success_desc": "Đánh giá của bạn đã được gửi đến booster để duyệt trước khi hiển thị công khai.",
+    "close": "Đóng",
+    "error": "Có lỗi xảy ra khi gửi. Vui lòng thử lại."
   },
   "partner_form": {
     "title": "Hợp tác cùng Tacticianclimb",
@@ -65,5 +107,27 @@
   "gallery": {
     "title": "Thành Tích & Hoạt Động",
     "subtitle": "Screenshots thực tế từ gameplay, community, và quá trình phát triển"
+  },
+  "dashboard": {
+    "page_builder": "Xây dựng Trang",
+    "reviews": "Đánh giá",
+    "leads": "Khách hàng",
+    "settings": "Cài đặt",
+    "applications": "Đơn ứng tuyển",
+    "boosters": "Boosters",
+    "community": "Cộng đồng",
+    "admin_panel": "Quản trị viên",
+    "preview": "Xem trước",
+    "editing": "Đang sửa",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "saved": "Đã lưu!",
+    "view_live": "Xem trang",
+    "logout": "Đăng xuất",
+    "fixed_label": "Cố định"
+  },
+  "faq": {
+    "title": "Các Câu Hỏi Thường Gặp",
+    "subtitle": "Giải đáp mọi thắc mắc của bạn về dịch vụ leo rank TFT."
   }
 }

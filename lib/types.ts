@@ -100,6 +100,7 @@ export interface WhyChooseContent {
 export interface ReviewItem {
   id: string;
   username: string;
+  server?: string;
   rank_before: string;
   rank_after: string;
   days?: string;
@@ -112,8 +113,15 @@ export interface ReviewItem {
 export interface CommunityContent {
   title: string;
   description: string;
-  link_text: string;
-  link_url: string;
+  cta?: string;
+  cta_text?: string;
+  cta_url?: string;
+  link_text?: string;
+  link_url?: string;
+  testictour_text?: string;
+  testictour_url?: string;
+  image_src?: string;
+  stats?: { label: string; value: string }[];
 }
 
 export interface ExternalContent {
@@ -140,11 +148,12 @@ export interface ComparisonContent {
 export interface Lead {
   id: string;
   booster_id: string;
+  game?: string;
   contact_info: string;
   current_rank: string;
   desired_rank: string;
   message: string;
-  status: 'new' | 'contacted' | 'completed';
+  status: 'new' | 'read' | 'contacted' | 'completed';
   created_at: string;
 }
 
@@ -165,4 +174,7 @@ export interface BoosterPageData {
   sections: BoosterSection[];
   proof_items: ProofItem[];
   reviews: ReviewItem[];
+  services?: any[];
+  faqs?: any[];
+  platform_settings?: any;
 }

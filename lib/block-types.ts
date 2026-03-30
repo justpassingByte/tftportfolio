@@ -23,7 +23,11 @@ export type BlockType =
   | 'comparison'
   | 'proof'
   | 'community'
-  | 'external';
+  | 'external'
+  | 'donation'
+  | 'video'
+  | 'pricing'
+  | 'timeline';
 
 // ---- Per-block style settings ----------------------------
 export interface BlockStyle {
@@ -74,6 +78,7 @@ export interface BlockMeta {
   description: string;
   defaultContent: Record<string, unknown>;
   defaultStyle?: Partial<BlockStyle>;
+  isAdminOnly?: boolean;
 }
 
 export const BLOCK_PALETTE: BlockMeta[] = [
@@ -277,6 +282,8 @@ export const BLOCK_PALETTE: BlockMeta[] = [
       headline: 'Who am I?',
       paragraphs: ['Top challenger player...'],
       avatar_image: '',
+      missionStatement: 'Mục tiêu của mình là xây dựng cộng đồng TFT vững mạnh...',
+      missionAuthor: 'ngusitink, Founder'
     },
     defaultStyle: { width: 'wide', padding: 'lg' },
   },
@@ -288,6 +295,10 @@ export const BLOCK_PALETTE: BlockMeta[] = [
     defaultContent: {
       title: 'Current vs Past',
       subtitle: '',
+      old_label: 'Web Boosting Truyền Thống',
+      old_sublabel: 'Mô hình lạc hậu từ 2012',
+      new_label: 'Tacticianclimb',
+      new_sublabel: 'Hệ sinh thái cộng đồng mới',
       items: [
         { feature: 'Speed', oldWay: 'Slow', newWay: 'Fast' }
       ]
@@ -307,18 +318,37 @@ export const BLOCK_PALETTE: BlockMeta[] = [
   },
   {
     type: 'community',
-    label: 'Community',
-    icon: '🌐',
-    description: 'Discord/Community spotlight',
+    label: 'Community / Promo',
+    icon: '👥',
+    description: 'Lead visitors to community or Discord',
     defaultContent: {
-      title: 'Join Community',
-      subtitle: 'Talk with others',
-      image_src: '',
-      stats: [{ label: 'Members', value: '1K+' }],
+      title: 'Join Our Community',
+      description: 'Connect with other TFT players.',
       cta_text: 'Join Discord',
-      cta_url: '#'
+      cta_url: '#',
+      image_src: '',
+      testictour_text: 'Join Testictour',
+      testictour_url: 'https://testictour.com',
+      stats: [],
     },
-    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+    defaultStyle: { width: 'full', padding: 'lg', textAlign: 'center' },
+    isAdminOnly: true,
+  },
+  {
+    type: 'faq',
+    label: 'FAQ / Thường hỏi',
+    icon: '❓',
+    description: 'Expandable Q&A accordion',
+    defaultContent: {
+      title: 'Các Câu Hỏi Thường Gặp',
+      subtitle: 'Giải đáp mọi thắc mắc của bạn về dịch vụ leo rank TFT.',
+      items: [
+        { question: 'Thời gian hoàn thành đơn?', answer: 'Thông thường khoảng 1-3 ngày tuỳ vào rank hiện tại của bạn.' },
+        { question: 'Tài khoản của tôi có an toàn không?', answer: 'An toàn 100%. Tôi cày tay hoàn toàn và không dùng bất cứ phần mềm thứ 3 nào.' },
+        { question: 'Có cần đưa mã bảo mật không?', answer: 'Chỉ cần gửi mã đăng nhập lần đầu tiên, tôi sẽ không thay đổi bất kỳ thông tin nào.' }
+      ]
+    },
+    defaultStyle: { width: 'medium', padding: 'md', textAlign: 'left' }
   },
   {
     type: 'external',
@@ -331,6 +361,67 @@ export const BLOCK_PALETTE: BlockMeta[] = [
       platforms: [{ name: 'Twitch', url: '#', icon_url: '' }]
     },
     defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+  },
+  {
+    type: 'donation',
+    label: 'Donation',
+    icon: '☕',
+    description: 'Tip or support methods',
+    defaultContent: {
+      title: 'Support My Work',
+      subtitle: 'If you enjoy my content or service, consider leaving a tip!',
+      methods: [
+        { platform: 'Momo', detail: '0901234567 - Nguyen Van A', url: '', qr_url: '' },
+        { platform: 'Bank Transfer', detail: 'Techcombank: 1903xxx - NGUYEN A', url: '', qr_url: '' },
+        { platform: 'PayPal', detail: 'paypal.me/example', url: 'https://paypal.me/example', qr_url: '' }
+      ]
+    },
+    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+  },
+  {
+    type: 'video',
+    label: 'Video',
+    icon: '▶️',
+    description: 'Embed YouTube or Twitch',
+    defaultContent: {
+      title: 'Watch Me Play',
+      subtitle: 'Highlights from my recent games',
+      video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      thumbnail_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop'
+    },
+    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+  },
+  {
+    type: 'pricing',
+    label: 'Pricing Plans',
+    icon: '💎',
+    description: 'Tiered service pricing',
+    defaultContent: {
+      title: 'Boosting Plans',
+      subtitle: 'Choose a package that fits your goal',
+      plans: [
+        { name: 'Basic', price: '20M', description: 'Up to Diamond', features: 'Solo Queue, Standard Speed', is_popular: false, button_text: 'Choose', button_url: '#' },
+        { name: 'Pro', price: '50M', description: 'Up to Master', features: 'Duo Queue, High Win Rate, Priority', is_popular: true, button_text: 'Choose', button_url: '#' },
+        { name: 'Elite', price: 'Custom', description: 'Challenger push', features: 'Direct Coaching, VPN, Streaming', is_popular: false, button_text: 'Contact Me', button_url: '#' }
+      ]
+    },
+    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+  },
+  {
+    type: 'timeline',
+    label: 'Timeline',
+    icon: '⏳',
+    description: 'History and Milestones',
+    defaultContent: {
+      title: 'My Journey',
+      subtitle: 'How I reached the top',
+      events: [
+        { year: '2022', title: 'Started Playing', description: 'Reached Diamond in first season' },
+        { year: '2023', title: 'Hit Master', description: 'Began analyzing meta deeply' },
+        { year: '2024', title: 'Challenger', description: 'Top 10 server. Started professional boosting' }
+      ]
+    },
+    defaultStyle: { width: 'medium', padding: 'lg', textAlign: 'left' },
   },
 ];
 

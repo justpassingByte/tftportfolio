@@ -29,6 +29,7 @@ import AboutWithAvatar from '@/components/sections/about-with-avatar';
 import Navbar from '@/components/layout/navbar';
 import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { defaultCommunityContent } from '@/lib/default-content';
 
 interface TemplateRendererProps {
   data: BoosterPageData;
@@ -72,9 +73,8 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
             key="hero"
             content={content as unknown as HeroContent}
             isBoosterProfile={!isAdmin}
-            onPrimaryClick={() => isAdmin ? setIsPartnerFormOpen(true) : setIsCustomerFormOpen(true)}
-            onSecondaryClick={() => window.open('https://testictour.com', '_blank')}
-            onTertiaryClick={() => setIsCustomerFormOpen(true)}
+            onPrimaryClick={() => setIsCustomerFormOpen(true)}
+            onSecondaryClick={() => setIsPartnerFormOpen(true)}
           />
         );
       case 'proof':
@@ -101,6 +101,8 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
             avatarAlt={(content as { avatarAlt?: string }).avatarAlt}
             highlights={(content as { highlights?: { icon: string; label: string; value: string }[] }).highlights}
             secondaryImageUrl={(content as { secondaryImageUrl?: string }).secondaryImageUrl}
+            missionStatement={(content as { missionStatement?: string }).missionStatement}
+            missionAuthor={(content as { missionAuthor?: string }).missionAuthor}
           />
         );
       case 'why_me':
@@ -172,18 +174,22 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
             key={block.id}
             content={content as unknown as HeroContent}
             isBoosterProfile={!isAdmin}
-            onPrimaryClick={() => isAdmin ? setIsPartnerFormOpen(true) : setIsCustomerFormOpen(true)}
-            onSecondaryClick={() => window.open('https://testictour.com', '_blank')}
-            onTertiaryClick={() => setIsCustomerFormOpen(true)}
+            onPrimaryClick={() => setIsCustomerFormOpen(true)}
+            onSecondaryClick={() => setIsPartnerFormOpen(true)}
           />
         );
-      case 'proof':
+      case 'proof': {
+        const blockItems = (content as { items?: ProofItem[] }).items;
+        const finalItems = blockItems && blockItems.length > 0 
+          ? blockItems 
+          : (data.proof_items && data.proof_items.length > 0 ? data.proof_items : blockItems);
         return (
           <ProofSection
             key={block.id}
-            items={(content as { items?: ProofItem[] }).items ?? data.proof_items}
+            items={finalItems}
           />
         );
+      }
       case 'personal':
         return (
           <PersonalSection
@@ -201,6 +207,8 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
             avatarAlt={(content as { avatarAlt?: string }).avatarAlt}
             highlights={(content as { highlights?: { icon: string; label: string; value: string }[] }).highlights}
             secondaryImageUrl={(content as { secondaryImageUrl?: string }).secondaryImageUrl}
+            missionStatement={(content as { missionStatement?: string }).missionStatement}
+            missionAuthor={(content as { missionAuthor?: string }).missionAuthor}
           />
         );
       case 'why_me':
@@ -218,12 +226,9 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
           />
         );
       case 'reviews': {
-        const blockReviews = (content as { reviews?: ReviewItem[] }).reviews;
-        const resolvedReviews = blockReviews && blockReviews.length > 0
-          ? blockReviews
-          : data.reviews && (data.reviews as ReviewItem[]).length > 0
+        const resolvedReviews = data.reviews && (data.reviews as ReviewItem[]).length > 0
             ? (data.reviews as ReviewItem[])
-            : undefined;
+            : [];
         return (
           <Testimonials
             key={block.id}
@@ -282,9 +287,13 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
     }
   };
 
+  const currentActiveSections = sectionOrder.length > 0 
+    ? sectionOrder 
+    : activeBlocks.map(b => b.type as string);
+
   return (
     <>
-      <Navbar displayName={data.profile.display_name} />
+      <Navbar displayName={data.profile.display_name} activeSections={currentActiveSections} contactLinks={data.profile.contact_links} />
       <main className="min-h-screen bg-slate-950 pt-16">
         {sectionOrder.length > 0 ? (
           <>
@@ -305,7 +314,7 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
           </>
         ) : activeBlocks.length > 0 ? (
           <div className="space-y-0">
-            {activeBlocks.filter(b => b.type !== 'community' && b.type !== 'external').map((block) => (
+            {activeBlocks.map((block) => (
               <div key={block.id} id={block.type} className="scroll-mt-16">
                 {renderLiveBlock(block)}
               </div>
@@ -322,10 +331,7 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
           </div>
         )}
 
-        {/* Fixed Community section — always shown, not editable */}
-        <div id="community" className="scroll-mt-16">
-          <Community />
-        </div>
+
 
         <PartnerForm 
           isOpen={isPartnerFormOpen}

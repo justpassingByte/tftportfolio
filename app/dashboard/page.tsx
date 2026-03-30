@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Palette, Eye, Save, Home, X, Brush, Star, MessageSquare, Settings2, ExternalLink, LogOut, Shield, Users, FileText, Plus, Globe, Trash2 } from 'lucide-react';
+import { Palette, Eye, Save, Home, X, Brush, Star, MessageSquare, Settings2, ExternalLink, LogOut, Shield, Users, FileText, Plus, Trash2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,8 +25,7 @@ import PageSettingsPanel from '@/components/builder/page-settings-panel';
 import ReviewsTab from '@/components/dashboard/reviews-tab';
 import LeadsTab from '@/components/dashboard/leads-tab';
 import Link from 'next/link';
-
-type DashboardTab = 'builder' | 'reviews' | 'leads' | 'admin_apps' | 'admin_users' | 'admin_community';
+type DashboardTab = 'builder' | 'reviews' | 'leads' | 'admin_apps' | 'admin_users';
 
 const BOOSTER_TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
   { id: 'builder', label: 'Page Builder', icon: <Brush className="w-4 h-4" /> },
@@ -37,7 +36,6 @@ const BOOSTER_TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[]
 const ADMIN_TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
   { id: 'admin_apps', label: 'Applications', icon: <FileText className="w-4 h-4" /> },
   { id: 'admin_users', label: 'Boosters', icon: <Users className="w-4 h-4" /> },
-  { id: 'admin_community', label: 'Community', icon: <Globe className="w-4 h-4" /> },
 ];
 
 // Default blocks that replicate the existing landing page
@@ -267,25 +265,6 @@ function AdminUsersTab() {
   );
 }
 
-function AdminCommunityTab() {
-  const [community, setCommunity] = useState({ title: 'Community', description: 'Join our active TFT community.', link_text: 'Join Discord', link_url: '#' });
-  const [saved, setSaved] = useState(false);
-  return (
-    <div className="max-w-2xl space-y-6">
-      <h2 className="text-xl font-bold text-white">Community Section</h2>
-      <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-5 space-y-4">
-        <div><Label className="text-slate-300 text-sm mb-1.5 block">Title</Label><Input value={community.title} onChange={(e) => setCommunity({ ...community, title: e.target.value })} className="bg-slate-800 border-slate-700 text-white" /></div>
-        <div><Label className="text-slate-300 text-sm mb-1.5 block">Description</Label><Textarea value={community.description} onChange={(e) => setCommunity({ ...community, description: e.target.value })} rows={3} className="bg-slate-800 border-slate-700 text-white resize-none" /></div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><Label className="text-slate-300 text-sm mb-1.5 block">Button Text</Label><Input value={community.link_text} onChange={(e) => setCommunity({ ...community, link_text: e.target.value })} className="bg-slate-800 border-slate-700 text-white" /></div>
-          <div><Label className="text-slate-300 text-sm mb-1.5 block">Button URL</Label><Input value={community.link_url} onChange={(e) => setCommunity({ ...community, link_url: e.target.value })} className="bg-slate-800 border-slate-700 text-white" /></div>
-        </div>
-        <Button size="sm" onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2000); }} className="bg-purple-600 hover:bg-purple-700 text-white h-8 text-xs"><Save className="w-3 h-3 mr-1" /> {saved ? 'Saved!' : 'Save'}</Button>
-      </div>
-    </div>
-  );
-}
-
 // ================================================================
 // Main Dashboard
 // ================================================================
@@ -369,28 +348,28 @@ export default function DashboardPage() {
     if (!meta) return;
     const newBlock: Block = { id: generateBlockId(), type, content: { ...meta.defaultContent }, style: { ...DEFAULT_BLOCK_STYLE, ...(meta.defaultStyle ?? {}) } };
     setBlocks((prev) => { const next = [...prev]; next.splice(afterIndex + 1, 0, newBlock); return next; });
-  }, []);
+  }, [setBlocks]);
 
   const moveBlock = useCallback((index: number, direction: 'up' | 'down') => {
     setBlocks((prev) => { const next = [...prev]; const t = direction === 'up' ? index - 1 : index + 1; if (t < 0 || t >= next.length) return prev; [next[index], next[t]] = [next[t], next[index]]; return next; });
-  }, []);
+  }, [setBlocks]);
 
   const duplicateBlock = useCallback((index: number) => {
     setBlocks((prev) => { const next = [...prev]; next.splice(index + 1, 0, { ...prev[index], id: generateBlockId(), content: { ...prev[index].content }, style: { ...prev[index].style } }); return next; });
-  }, []);
+  }, [setBlocks]);
 
   const deleteBlock = useCallback((index: number) => {
     setBlocks((prev) => prev.filter((_, i) => i !== index));
     if (blocks[index]?.id === selectedBlockId) { setSelectedBlockId(null); setShowBlockSettings(false); }
-  }, [blocks, selectedBlockId]);
+  }, [blocks, selectedBlockId, setBlocks]);
 
   const updateBlockContent = useCallback((blockId: string, content: Record<string, unknown>) => {
     setBlocks((prev) => prev.map((b) => (b.id === blockId ? { ...b, content } : b)));
-  }, []);
+  }, [setBlocks]);
 
   const updateBlockStyle = useCallback((blockId: string, style: BlockStyle) => {
     setBlocks((prev) => prev.map((b) => (b.id === blockId ? { ...b, style } : b)));
-  }, []);
+  }, [setBlocks]);
 
   const handleSave = async () => {
     const supabase = createClient();
@@ -594,7 +573,7 @@ export default function DashboardPage() {
                 style={bgStyle}
                 onClick={() => { if (!isPreview) { setSelectedBlockId(null); setShowBlockSettings(false); } }}
               >
-                {!isPreview && <AddBlockMenu onAdd={(type) => addBlock(type, -1)} />}
+                {!isPreview && <AddBlockMenu onAdd={(type) => addBlock(type, -1)} isAdmin={isAdmin} />}
 
                 {blocks.map((block, index) => {
                   const isLockedBlock = (block.type === 'hero' || block.type === 'community') && !isAdmin;
@@ -666,11 +645,6 @@ export default function DashboardPage() {
           {activeTab === 'admin_users' && (
             <div className="flex-1 overflow-y-auto p-6">
               <AdminUsersTab />
-            </div>
-          )}
-          {activeTab === 'admin_community' && (
-            <div className="flex-1 overflow-y-auto p-6">
-              <AdminCommunityTab />
             </div>
           )}
         </div>

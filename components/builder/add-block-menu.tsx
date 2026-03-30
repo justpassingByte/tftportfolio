@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 
 interface AddBlockMenuProps {
   onAdd: (type: BlockType) => void;
+  isAdmin?: boolean;
 }
 
-export default function AddBlockMenu({ onAdd }: AddBlockMenuProps) {
+export default function AddBlockMenu({ onAdd, isAdmin = false }: AddBlockMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -34,7 +35,7 @@ export default function AddBlockMenu({ onAdd }: AddBlockMenuProps) {
       {/* Palette dropdown */}
       {isOpen && (
         <div className="absolute top-full mt-2 z-50 w-80 max-h-96 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl p-3 shadow-2xl grid grid-cols-2 gap-2">
-          {BLOCK_PALETTE.map((block) => (
+          {BLOCK_PALETTE.filter(block => isAdmin || !block.isAdminOnly).map((block) => (
             <button
               key={block.type}
               onClick={() => {

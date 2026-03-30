@@ -26,14 +26,17 @@ import {
 
 // Section labels for display
 const SECTION_LABELS: Record<SectionType, string> = {
-  hero: '🎯 Hero',
-  proof: '🖼️ Proof Gallery',
-  personal: '📝 Personal',
-  why_me: '✅ Why Choose Me',
-  reviews: '⭐ Reviews',
-  lead_form: '📩 Lead Form',
-  community: '👥 Community',
-  external: '🏆 External Platform',
+  hero: 'Hero / Banner',
+  proof: 'Trust Bar',
+  personal: 'About / Intro',
+  why_me: 'Why Choose Me',
+  reviews: 'Reviews',
+  lead_form: 'Lead Form',
+  community: 'Community',
+  external: 'External Links',
+  gallery: 'Gallery',
+  about_avatar: 'Avatar Intro',
+  comparison: 'Comparison'
 };
 
 export default function EditPageTab() {

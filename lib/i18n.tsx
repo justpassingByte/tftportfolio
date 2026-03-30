@@ -10,7 +10,7 @@ type Translations = typeof viTranslations;
 interface I18nContextType {
   locale: Locale;
   t: Translations;
-  toggleLocale: () => void;
+  toggleLocale: (targetLocale?: Locale) => void;
 }
 
 const translations: Record<Locale, Translations> = {
@@ -27,8 +27,8 @@ const I18nContext = createContext<I18nContextType>({
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>('vi');
 
-  const toggleLocale = useCallback(() => {
-    setLocale((prev) => (prev === 'vi' ? 'en' : 'vi'));
+  const toggleLocale = useCallback((targetLocale?: Locale) => {
+    setLocale((prev) => targetLocale ?? (prev === 'vi' ? 'en' : 'vi'));
   }, []);
 
   return (

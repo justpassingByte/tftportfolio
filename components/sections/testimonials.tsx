@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Star, Quote, ChevronLeft, ChevronRight, PenLine } from 'lucide-react';
+import { Star, Quote, ChevronLeft, ChevronRight, PenLine, Globe } from 'lucide-react';
 import type { ReviewItem } from '@/lib/types';
 import ReviewForm from './review-form';
+import { useI18n } from '@/lib/i18n';
 
 interface TestimonialsProps {
   reviews?: ReviewItem[];
@@ -14,24 +15,16 @@ interface TestimonialsProps {
 
 export default function Testimonials({
   reviews: reviewsProp,
-  title = 'What My Clients Say',
-  subtitle = 'Real stories from real people who trusted me with their climb',
   boosterId,
 }: TestimonialsProps) {
+  const { t } = useI18n();
   const reviews = reviewsProp ?? [];
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
 
-  const goTo = useCallback(
-    (index: number) => {
-      if (isAnimating || reviews.length <= 1) return;
-      setIsAnimating(true);
-      setActiveIndex(index);
-      setTimeout(() => setIsAnimating(false), 600);
-    },
-    [isAnimating, reviews.length]
-  );
+  const goTo = useCallback((index: number) => {
+    setActiveIndex(index);
+  }, []);
 
   const goNext = useCallback(() => {
     if (reviews.length <= 1) return;
@@ -50,27 +43,76 @@ export default function Testimonials({
     return () => clearInterval(interval);
   }, [goNext, reviews.length]);
 
-  // Display 3 reviews on desktop: prev, active, next
-  const getVisibleReviews = () => {
-    if (reviews.length === 0) return [];
-    if (reviews.length === 1) return [{ review: reviews[0], position: 'active' as const }];
-    if (reviews.length === 2) {
-      const next = (activeIndex + 1) % reviews.length;
-      return [
-        { review: reviews[activeIndex], position: 'active' as const },
-        { review: reviews[next], position: 'next' as const },
-      ];
-    }
-    const prev = (activeIndex - 1 + reviews.length) % reviews.length;
-    const next = (activeIndex + 1) % reviews.length;
-    return [
-      { review: reviews[prev], position: 'prev' as const },
-      { review: reviews[activeIndex], position: 'active' as const },
-      { review: reviews[next], position: 'next' as const },
-    ];
-  };
+  // Derived stats
+  const totalReviews = reviews.length;
+  const avgRating = totalReviews > 0
+    ? (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / totalReviews).toFixed(1)
+    : '0.0';
+  const satisfaction = Number(avgRating) >= 4.8 ? '100%' : Number(avgRating) >= 4.0 ? '98%' : '90%';
 
-  const visible = getVisibleReviews();
+  const getCardStyle = (index: number) => {
+    if (reviews.length === 0) return {};
+    if (reviews.length === 1) {
+      return { 
+        transform: 'translateX(0) scale(1)', 
+        opacity: 1, 
+        zIndex: 10,
+        position: 'relative' as const 
+      };
+    }
+
+    let offset = index - activeIndex;
+    if (reviews.length >= 3) {
+      if (offset < -1 && offset < -Math.floor(reviews.length / 2)) offset += reviews.length;
+      if (offset > 1 && offset > Math.floor(reviews.length / 2)) offset -= reviews.length;
+    }
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const baseTranslate = isMobile ? 105 : 110; 
+
+    if (offset === 0) {
+      return {
+        transform: 'translateX(0%) scale(1.05)',
+        opacity: 1,
+        zIndex: 10,
+        position: 'absolute' as const,
+        inset: 0,
+        pointerEvents: 'auto' as const,
+      };
+    }
+    if (offset === -1 || (offset < 0 && reviews.length === 2)) {
+      return {
+        transform: `translateX(-${baseTranslate}%) scale(0.95)`,
+        opacity: 0.5,
+        zIndex: 0,
+        filter: 'blur(1px)',
+        position: 'absolute' as const,
+        inset: 0,
+        pointerEvents: 'none' as const,
+      };
+    }
+    if (offset === 1 || (offset > 0 && reviews.length === 2)) {
+      return {
+        transform: `translateX(${baseTranslate}%) scale(0.95)`,
+        opacity: 0.5,
+        zIndex: 0,
+        filter: 'blur(1px)',
+        position: 'absolute' as const,
+        inset: 0,
+        pointerEvents: 'none' as const,
+      };
+    }
+    
+    // Hidden cards
+    return {
+      transform: `translateX(${offset > 0 ? 200 : -200}%) scale(0.8)`,
+      opacity: 0,
+      zIndex: -1,
+      position: 'absolute' as const,
+      inset: 0,
+      pointerEvents: 'none' as const,
+    };
+  };
 
   return (
     <section className="py-24 px-4 bg-slate-950 relative overflow-hidden">
@@ -83,97 +125,88 @@ export default function Testimonials({
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-600/10 border border-purple-500/20 text-purple-300 text-sm font-medium mb-6">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            Trusted by players across all ranks
+            {t.reviews.badge}
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            {title}
+            {t.reviews.title}
           </h2>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto mb-8">
-            {subtitle}
+            {t.reviews.subtitle}
           </p>
           <button
             onClick={() => setIsReviewFormOpen(true)}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors shadow-lg shadow-purple-600/20"
           >
             <PenLine className="w-4 h-4" />
-            Viết Đánh Giá
+            {t.reviews.write_review}
           </button>
         </div>
 
         {reviews.length > 0 ? (
           <>
-            {/* Carousel - Desktop */}
-            <div className="hidden md:block relative">
-              <div className="flex items-stretch justify-center gap-6 px-12">
-                {visible.map(({ review, position }) => (
-                  <div
-                    key={review.id}
-                    className={`flex-1 max-w-md transition-all duration-600 ease-out ${
-                      position === 'active'
-                        ? 'scale-105 opacity-100 z-10'
-                        : 'scale-95 opacity-50 blur-[1px]'
-                    }`}
-                  >
-                    <TestimonialCard review={review} isActive={position === 'active'} />
-                  </div>
-                ))}
-              </div>
+            {/* Carousel Container */}
+            <div className="relative mx-auto w-full max-w-md h-[400px] md:h-[350px]">
+              {reviews.map((review, i) => (
+                <div
+                  key={review.id}
+                  className="w-full h-full transition-all duration-700 ease-in-out origin-center"
+                  style={getCardStyle(i)}
+                >
+                  <TestimonialCard review={review} isActive={i === activeIndex} t={t} />
+                </div>
+              ))}
 
-              {/* Nav arrows */}
+              {/* Nav arrows - Desktop */}
               {reviews.length > 1 && (
-                <>
+                <div className="hidden md:block">
                   <button
                     onClick={goPrev}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 hover:border-purple-500/50 flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
+                    className="absolute -left-20 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 hover:border-purple-500/50 flex items-center justify-center transition-all duration-300 backdrop-blur-sm z-20"
                   >
                     <ChevronLeft className="w-5 h-5 text-white" />
                   </button>
                   <button
                     onClick={goNext}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 hover:border-purple-500/50 flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
+                    className="absolute -right-20 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 hover:border-purple-500/50 flex items-center justify-center transition-all duration-300 backdrop-blur-sm z-20"
                   >
                     <ChevronRight className="w-5 h-5 text-white" />
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Carousel - Mobile */}
-            <div className="md:hidden">
-              <TestimonialCard review={reviews[activeIndex]} isActive />
-
-              {reviews.length > 1 && (
-                <div className="flex justify-between items-center mt-6 px-4">
-                  <button
-                    onClick={goPrev}
-                    className="w-10 h-10 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 flex items-center justify-center transition-all"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-white" />
-                  </button>
-                  <div className="flex gap-2">
-                    {reviews.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => goTo(i)}
-                        className={`h-2 rounded-full transition-all duration-500 ${
-                          i === activeIndex
-                            ? 'w-8 bg-purple-500'
-                            : 'w-2 bg-slate-600 hover:bg-slate-500'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    onClick={goNext}
-                    className="w-10 h-10 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 flex items-center justify-center transition-all"
-                  >
-                    <ChevronRight className="w-4 h-4 text-white" />
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Dots - Desktop */}
+            {/* Mobile controls */}
+            {reviews.length > 1 && (
+              <div className="md:hidden flex justify-between items-center mt-8 px-4 max-w-sm mx-auto">
+                <button
+                  onClick={goPrev}
+                  className="w-10 h-10 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 flex items-center justify-center transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4 text-white" />
+                </button>
+                <div className="flex gap-2">
+                  {reviews.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goTo(i)}
+                      className={`h-2 rounded-full transition-all duration-500 ${
+                        i === activeIndex
+                          ? 'w-8 bg-purple-500'
+                          : 'w-2 bg-slate-600 hover:bg-slate-500'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={goNext}
+                  className="w-10 h-10 rounded-full bg-slate-800/80 hover:bg-purple-600/30 border border-slate-700/50 flex items-center justify-center transition-all"
+                >
+                  <ChevronRight className="w-4 h-4 text-white" />
+                </button>
+              </div>
+            )}
+
+            {/* Desktop Dots */}
             {reviews.length > 1 && (
               <div className="hidden md:flex justify-center gap-2 mt-12">
                 {reviews.map((_, i) => (
@@ -191,11 +224,11 @@ export default function Testimonials({
             )}
 
             {/* Stats bar */}
-            <div className="mt-16 grid grid-cols-3 gap-4 max-w-2xl mx-auto">
+            <div className="mt-16 grid grid-cols-3 gap-4 max-w-2xl mx-auto relative z-10">
               {[
-                { value: `${reviews.length}+`, label: 'Happy Clients' },
-                { value: '5.0', label: 'Average Rating' },
-                { value: '100%', label: 'Satisfaction' },
+                { value: `${totalReviews}+`, label: t.reviews.happy_clients },
+                { value: avgRating, label: t.reviews.avg_rating },
+                { value: satisfaction, label: t.reviews.satisfaction },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <p className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
@@ -207,10 +240,10 @@ export default function Testimonials({
             </div>
           </>
         ) : (
-          <div className="text-center py-12 rounded-2xl bg-slate-800/30 border border-slate-700/30">
+          <div className="text-center py-12 rounded-2xl bg-slate-800/30 border border-slate-700/30 relative z-10 mx-auto max-w-2xl">
             <Star className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-white font-medium text-lg mb-2">Chưa có đánh giá nào</h3>
-            <p className="text-slate-400">Hãy là người đầu tiên để lại nhận xét với dịch vụ này!</p>
+            <h3 className="text-white font-medium text-lg mb-2">{t.reviews.no_reviews}</h3>
+            <p className="text-slate-400">{t.reviews.no_reviews_desc}</p>
           </div>
         )}
       </div>
@@ -228,21 +261,23 @@ export default function Testimonials({
 function TestimonialCard({
   review,
   isActive,
+  t,
 }: {
   review: ReviewItem;
   isActive: boolean;
+  t: any;
 }) {
   return (
     <div
-      className={`relative rounded-2xl p-8 transition-all duration-500 ${
+      className={`relative rounded-2xl p-8 h-full bg-slate-800/30 border border-slate-700/30 transition-all duration-700 flex flex-col ${
         isActive
-          ? 'bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-purple-500/30 shadow-2xl shadow-purple-600/10'
-          : 'bg-slate-800/30 border border-slate-700/30'
+          ? 'bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/30 shadow-2xl shadow-purple-600/10'
+          : ''
       }`}
     >
       {/* Quote icon */}
       <div
-        className={`absolute -top-4 -left-2 w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
+        className={`absolute -top-4 -left-2 w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-700 ${
           isActive
             ? 'bg-gradient-to-br from-purple-600 to-blue-600 shadow-lg shadow-purple-600/30'
             : 'bg-slate-800 border border-slate-700'
@@ -251,53 +286,69 @@ function TestimonialCard({
         <Quote className="w-5 h-5 text-white" />
       </div>
 
-      {/* Rating */}
-      <div className="flex gap-1 mb-5 mt-2">
-        {[...Array(review.rating)].map((_, i) => (
-          <Star
-            key={i}
-            className={`w-4 h-4 transition-all duration-500 ${
-              isActive
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'fill-yellow-400/50 text-yellow-400/50'
-            }`}
-          />
-        ))}
+      <div className="flex items-center justify-between mb-5 mt-2">
+        {/* Rating */}
+        <div className="flex gap-1">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={`w-4 h-4 transition-all duration-500 ${
+                i < (review.rating || 5)
+                  ? isActive 
+                    ? 'fill-yellow-400 text-yellow-400' 
+                    : 'fill-yellow-400/50 text-yellow-400/50'
+                  : 'fill-slate-700 text-slate-700'
+              }`}
+            />
+          ))}
+        </div>
+        
+        {/* Server badge */}
+        {review.server && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/80 border border-slate-700/50">
+            <Globe className="w-3 h-3 text-blue-400" />
+            <span className="text-[10px] font-medium text-slate-300 uppercase tracking-wider">
+              {review.server.split(' ')[0]}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
-      <p className="text-slate-200 text-base leading-relaxed mb-6 min-h-[80px]">
-        &ldquo;{review.content}&rdquo;
-      </p>
+      <div className="flex-1 overflow-y-auto mb-6 pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <p className={`text-slate-200 text-base leading-relaxed transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-70'}`}>
+          &ldquo;{review.content}&rdquo;
+        </p>
+      </div>
 
       {/* Rank progression */}
-      <div className="flex items-center gap-3 mb-5 py-3 px-4 rounded-lg bg-slate-900/50 border border-slate-700/30">
-        <div className="flex-1">
-          <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Rank Journey</p>
-          <div className="flex items-center gap-2">
-            <span className="text-slate-300 font-medium">{review.rank_before}</span>
-            <span className="text-purple-400">→</span>
-            <span className="text-purple-300 font-bold">{review.rank_after}</span>
+      <div className="flex items-center gap-3 mb-5 py-3 px-4 rounded-lg bg-slate-900/50 border border-slate-700/30 shrink-0">
+        <div className="flex-1 overflow-hidden">
+          <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 truncate">{t.reviews.rank_journey}</p>
+          <div className="flex items-center gap-2 text-sm truncate">
+            <span className="text-slate-300 font-medium truncate shrink">{review.rank_before}</span>
+            <span className="text-purple-400 shrink-0">→</span>
+            <span className="text-purple-300 font-bold truncate shrink">{review.rank_after}</span>
           </div>
         </div>
         {review.days && (
-          <div className="text-right">
-            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Duration</p>
+          <div className="text-right shrink-0 ml-2 border-l border-slate-700/50 pl-3">
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{t.reviews.duration}</p>
             <p className="text-blue-300 font-medium text-sm">{review.days}</p>
           </div>
         )}
       </div>
 
       {/* Author */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600/30 to-blue-600/30 border border-purple-500/30 flex items-center justify-center">
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600/30 to-blue-600/30 border border-purple-500/30 flex items-center justify-center shrink-0">
           <span className="text-sm font-bold text-purple-300">
             {review.username.charAt(0).toUpperCase()}
           </span>
         </div>
-        <div>
-          <p className="text-white font-semibold text-sm">{review.username}</p>
-          <p className="text-slate-500 text-xs">Verified Client</p>
+        <div className="truncate">
+          <p className="text-white font-semibold text-sm truncate">{review.username}</p>
+          <p className="text-slate-500 text-xs truncate">{t.reviews.verified_client}</p>
         </div>
       </div>
     </div>

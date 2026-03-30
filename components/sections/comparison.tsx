@@ -11,6 +11,10 @@ export interface ComparisonItem {
 export interface ComparisonContent {
   title: string;
   subtitle: string;
+  old_label?: string;
+  old_sublabel?: string;
+  new_label?: string;
+  new_sublabel?: string;
   items: ComparisonItem[];
 }
 
@@ -47,8 +51,8 @@ export default function Comparison({ content }: ComparisonProps) {
                 <X className="w-6 h-6 text-red-400" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-slate-300">Web Boosting Truyền Thống</h3>
-                <p className="text-slate-500 text-sm">Mô hình lạc hậu từ 2012</p>
+                <h3 className="text-2xl font-bold text-slate-300">{content.old_label || 'Web Boosting Truyền Thống'}</h3>
+                <p className="text-slate-500 text-sm">{content.old_sublabel || 'Mô hình lạc hậu từ 2012'}</p>
               </div>
             </div>
 
@@ -77,8 +81,8 @@ export default function Comparison({ content }: ComparisonProps) {
                 <Check className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white">Tacticianclimb</h3>
-                <p className="text-purple-300 text-sm font-medium">Hệ sinh thái cộng đồng mới</p>
+                <h3 className="text-2xl font-bold text-white">{content.new_label || 'Tacticianclimb'}</h3>
+                <p className="text-purple-300 text-sm font-medium">{content.new_sublabel || 'Hệ sinh thái cộng đồng mới'}</p>
               </div>
             </div>
 

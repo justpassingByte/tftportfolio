@@ -1,5 +1,7 @@
 import TemplateRenderer from '@/components/builder/template-renderer';
 import { getBoosterByUsername } from '@/lib/data';
+import FAQ from '@/components/sections/faq';
+import Footer from '@/components/sections/footer';
 
 export default async function Home() {
   const data = await getBoosterByUsername('ngusitink');
@@ -12,5 +14,15 @@ export default async function Home() {
     );
   }
 
-  return <TemplateRenderer data={data} isAdmin={true} />;
+  return (
+    <div className="flex flex-col min-h-screen bg-[#020202]">
+      <main className="flex-1">
+        <TemplateRenderer data={data} isAdmin={true} />
+      </main>
+      
+      {/* Global sections outside of the builder */}
+      <FAQ />
+      <Footer />
+    </div>
+  );
 }
