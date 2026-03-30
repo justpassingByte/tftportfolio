@@ -14,9 +14,32 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Tacticianclimb — TFT Community, Boosting & Tournaments',
-  description: 'Cộng đồng TFT Việt Nam. Boosting, coaching, giải đấu và portfolio chuyên nghiệp cho booster.',
-  generator: 'v0.app',
+  title: 'Tacticianclimb | Global TFT Community',
+  description: 'The premium global platform for Teamfight Tactics (TFT). Expert boosting, professional coaching, community tournaments.',
+  keywords: 'TFT, Teamfight Tactics, TFT Boosting, TFT Coaching, TFT Tournaments, Tacticianclimb, Global TFT Community',
+  alternates: {
+    canonical: 'https://tftportfolio.vercel.app',
+    languages: {
+      'en-US': 'https://tftportfolio.vercel.app',
+      'vi-VN': 'https://tftportfolio.vercel.app',
+    },
+  },
+  openGraph: {
+    title: 'Tacticianclimb | Global TFT Community',
+    description: 'The premium global platform for Teamfight Tactics (TFT). Expert boosting, professional coaching, community tournaments.',
+    url: 'https://tftportfolio.vercel.app',
+    siteName: 'Tacticianclimb',
+    images: [{ url: '/logo.png', width: 800, height: 800, alt: 'Tacticianclimb Logo' }],
+    locale: 'en_US',
+    alternateLocale: ['vi_VN'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tacticianclimb | Global TFT Community',
+    description: 'The premium global platform for Teamfight Tactics (TFT).',
+    images: ['/logo.png'],
+  },
   icons: {
     icon: [
       {
@@ -26,10 +49,6 @@ export const metadata: Metadata = {
       {
         url: '/icon-dark-32x32.png',
         media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
       },
     ],
     apple: '/apple-icon.png',
@@ -42,7 +61,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="vi" className="dark">
+    <html lang="en" className="dark">
       <body className="font-sans antialiased bg-slate-950">
         <I18nProvider>
           {children}

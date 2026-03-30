@@ -36,8 +36,8 @@ export default function Navbar({ displayName, activeSections, contactLinks }: Na
           {/* Logo / Booster Name */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
-                T
+              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                <img src="/logo.png" alt="Tacticianclimb Logo" className="w-full h-full object-cover" />
               </div>
               <span className="text-white font-bold text-lg hidden sm:block tracking-wide">
                 Tacticianclimb <span className="text-slate-500 font-normal">/ {displayName}</span>
