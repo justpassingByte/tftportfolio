@@ -11,11 +11,17 @@ export type SectionType =
   | 'reviews'
   | 'lead_form'
   | 'community'
-  | 'external';
+  | 'external'
+  | 'gallery'
+  | 'about_avatar'
+  | 'comparison';
 
 // ---- Theme / Layout --------------------------------------
 export interface ThemeConfig {
   accent_color: string;       // hex, e.g. "#6d28d9"
+  accentColor?: string;
+  background_color: string;
+  font_family: string;
   spacing: 'compact' | 'normal' | 'spacious';
   mode: 'dark' | 'light';
 }
@@ -48,6 +54,8 @@ export interface BoosterPage {
   theme_config: ThemeConfig;
   section_order: SectionType[];
   is_published: boolean;
+  blocks?: any[];
+  blocks_en?: any[];
 }
 
 // ---- Per-section content shapes --------------------------
@@ -57,18 +65,20 @@ export interface HeroContent {
   subheadline: string;
   trust_badges: string[];
   avatar_initial?: string;
+  avatar_url?: string;
   cta_primary?: string;
   cta_secondary?: string;
+  cta_tertiary?: string;
 }
 
 export interface ProofItem {
   id: string;
   title: string;
   description: string;
-  image_url?: string;
-  caption?: string;
   tags: string[];
-  size: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large';
+  image_url?: string;
+  images?: string[];
 }
 
 export interface PersonalContent {
@@ -111,6 +121,19 @@ export interface ExternalContent {
   description: string;
   link_text: string;
   link_url: string;
+}
+
+// ---- Comparison ------------------------------------------
+export interface ComparisonItem {
+  feature: string;
+  oldWay: string;
+  newWay: string;
+}
+
+export interface ComparisonContent {
+  title: string;
+  subtitle: string;
+  items: ComparisonItem[];
 }
 
 // ---- Lead ------------------------------------------------

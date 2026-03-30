@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { I18nProvider } from '@/lib/i18n'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -13,8 +14,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Villiant - TFT Booster | Consistent LP, No Middleman',
-  description: 'High-level Teamfight Tactics booster. Every game played by me. Master+ decision making. Fast climbs, stable LP gains.',
+  title: 'Tacticianclimb — TFT Community, Boosting & Tournaments',
+  description: 'Cộng đồng TFT Việt Nam. Boosting, coaching, giải đấu và portfolio chuyên nghiệp cho booster.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -41,9 +42,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="vi" className="dark">
       <body className="font-sans antialiased bg-slate-950">
-        {children}
+        <I18nProvider>
+          {children}
+        </I18nProvider>
         <Analytics />
       </body>
     </html>

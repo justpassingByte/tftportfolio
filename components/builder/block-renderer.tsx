@@ -3,10 +3,16 @@
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Check, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Block } from '@/lib/block-types';
-import { WIDTH_MAP, PADDING_MAP, MARGIN_Y_MAP, RADIUS_MAP, SHADOW_MAP } from '@/lib/block-types';
+import { WIDTH_MAP, PADDING_MAP, MARGIN_Y_MAP, RADIUS_MAP, SHADOW_MAP, DEFAULT_BLOCK_STYLE } from '@/lib/block-types';
 import { defaultReviews } from '@/lib/default-content';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+
+import AboutWithAvatar from '@/components/sections/about-with-avatar';
+import Comparison from '@/components/sections/comparison';
+import ProofSection from '@/components/sections/proof';
+import Community from '@/components/sections/community';
+import ExternalPlatform from '@/components/sections/external-platform';
 
 interface BlockRendererProps {
   block: Block;
@@ -14,7 +20,7 @@ interface BlockRendererProps {
 }
 
 function getBlockWrapperClasses(block: Block, accentColor: string): { outer: string; inner: string; style?: React.CSSProperties } {
-  const s = block.style;
+  const s = block.style || DEFAULT_BLOCK_STYLE;
   const classes: string[] = [
     WIDTH_MAP[s.width],
     PADDING_MAP[s.padding],
@@ -84,10 +90,14 @@ export default function BlockRenderer({ block, accentColor = '#6d28d9' }: BlockR
           style={c.bg_image ? { backgroundImage: `url(${c.bg_image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-transparent to-blue-900/10 pointer-events-none" />
-          <div className={cn(WIDTH_MAP[block.style.width], PADDING_MAP[block.style.padding], 'mx-auto relative z-10 text-center')}>
+          <div className={cn(WIDTH_MAP[(block.style || DEFAULT_BLOCK_STYLE).width], PADDING_MAP[(block.style || DEFAULT_BLOCK_STYLE).padding], 'mx-auto relative z-10 text-center')}>
             <div className="mb-8 flex justify-center">
               <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-2 overflow-hidden bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center" style={{ borderColor: `${accentColor}50` }}>
-                <div className="text-5xl md:text-6xl">{(c.avatar_initial as string) ?? 'V'}</div>
+                {c.avatar_url ? (
+                  <img src={c.avatar_url as string} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-5xl md:text-6xl">{(c.avatar_initial as string) ?? 'V'}</div>
+                )}
               </div>
             </div>
             <h1 className="text-3xl md:text-5xl font-bold mb-3 text-white leading-tight">
@@ -228,14 +238,17 @@ export default function BlockRenderer({ block, accentColor = '#6d28d9' }: BlockR
       );
 
     case 'reviews': {
-      const reviews = defaultReviews;
+      const blockReviews = (c.reviews as { id: string; username: string; content: string; rank_before: string; rank_after: string; rating: number }[]);
+      const reviews = blockReviews && blockReviews.length > 0 ? blockReviews : defaultReviews;
+      const title = (c.title as string) ?? 'What Players Say';
+      const subtitle = (c.subtitle as string) ?? 'Real feedback from real climbs';
       return inner(
         <>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 text-center">What Players Say</h2>
-          <p className="text-slate-400 text-center mb-10">Real feedback from real climbs</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 text-center">{title}</h2>
+          <p className="text-slate-400 text-center mb-10">{subtitle}</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {reviews.slice(0, 6).map((review) => (
-              <div key={review.id} className="rounded-lg bg-slate-800/40 border border-slate-700/50 p-5">
+            {reviews.slice(0, 6).map((review, idx) => (
+              <div key={review.id ?? idx} className="rounded-lg bg-slate-800/40 border border-slate-700/50 p-5">
                 <div className="flex gap-1 mb-3">
                   {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
                 </div>
@@ -295,6 +308,29 @@ export default function BlockRenderer({ block, accentColor = '#6d28d9' }: BlockR
 
     case 'spacer':
       return <div className={cn((c.height as string) === 'sm' && 'h-4', (c.height as string) === 'md' && 'h-8', (c.height as string) === 'lg' && 'h-16', (c.height as string) === 'xl' && 'h-24', !(c.height as string) && 'h-8')} />;
+
+    case 'about_avatar':
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return inner(
+        <AboutWithAvatar {...(c as any)} />
+      );
+
+    case 'comparison':
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return inner(
+        <Comparison content={c as any} />
+      );
+
+    case 'proof':
+      return inner(<ProofSection />); // Assuming ProofSection handles its own DB fetches or internal props
+
+    case 'community':
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return inner(<Community content={c as any} />);
+
+    case 'external':
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return inner(<ExternalPlatform content={c as any} />);
 
     default:
       return inner(<p className="text-slate-500 text-center">Unknown block: {block.type}</p>);

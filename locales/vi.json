@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "about": "Giới thiệu",
+    "difference": "Khác biệt",
+    "results": "Thành tích",
+    "gallery": "Thư viện",
+    "reviews": "Đánh giá",
+    "dashboard_login": "Đăng nhập Dashboard"
+  },
+  "hero": {
+    "headline": "TFT Community & Tournaments.",
+    "headline_highlight": "Học hỏi và thi đấu.",
+    "subheadline": "Không chỉ là boosting. Tôi xây dựng một cộng đồng nơi người chơi giao lưu, tổ chức giải đấu và các booster có một nền tảng chuyên nghiệp.",
+    "cta_primary": "Hợp tác & Tổ chức",
+    "cta_secondary": "Join Testictour",
+    "cta_tertiary": "Học hỏi & Uỷ thác Rank"
+  },
+  "about": {
+    "title": "Tại Sao Tôi Làm Điều Này",
+    "p1": "Tôi là ngusitink — người đứng sau Tacticianclimb. Mục tiêu của tôi là tạo ra một trung tâm dành riêng cho cộng đồng TFT Việt Nam.",
+    "p2": "Đây là nơi để mọi người giao lưu, học hỏi kinh nghiệm, và đặc biệt là sân chơi để tổ chức các giải đấu chuyên nghiệp cũng như phong trào cộng đồng.",
+    "p3": "Quan trọng hơn, hệ thống này cung cấp cho mỗi booster một profile riêng biệt. Bạn có thể tuỳ chỉnh trang này hoàn toàn theo ý muốn, biến nó thành một portfolio cá nhân chuyên nghiệp để thu hút khách hàng.",
+    "p4": "Nếu bạn là booster muốn xây dựng thương hiệu cá nhân, hay một người chơi muốn tham gia các giải đấu hấp dẫn, Tacticianclimb là nơi dành cho bạn."
+  },
+  "comparison": {
+    "title": "Khác Biệt Của Chúng Tôi",
+    "subtitle": "Đã qua rồi cái thời dịch vụ chỉ lấy tiền và ẩn danh. Tacticianclimb mang sức mạnh lại cho bạn."
+  },
+  "why": {
+    "title": "Tại Sao Chọn Tacticianclimb",
+    "subtitle": "Không chỉ là boosting — đây là một hệ sinh thái"
+  },
+  "reviews": {
+    "title": "Người Chơi Nói Gì",
+    "subtitle": "Feedback thật từ những lần leo rank thật"
+  },
+  "community": {
+    "title": "Giao Lưu & Giải Đấu",
+    "description": "Discord server là tâm điểm cộng đồng. Nơi mọi người thảo luận meta, học hỏi từ high elo, và đăng ký tham gia các giải đấu thường xuyên.",
+    "cta": "Join Discord Server"
+  },
+  "external": {
+    "title": "Tạo Portfolio Của Riêng Bạn",
+    "description": "Mỗi booster partner được cấp một trang profile. Bạn có thể toàn quyền tuỳ chỉnh giao diện, layout, hiển thị thư viện ảnh, review để tạo thành 1 portfolio xịn xò.",
+    "cta": "Đăng ký nhận Portfolio"
+  },
+  "lead_form": {
+    "title": "Bạn quan tâm?",
+    "subtitle": "Nếu bạn không có thời gian cày game hoặc muốn xem pro chơi để học hỏi, hãy thuê tôi.",
+    "name": "Tên của bạn",
+    "rank": "Rank hiện tại",
+    "message": "Tin nhắn",
+    "submit": "Gửi yêu cầu"
+  },
+  "partner_form": {
+    "title": "Hợp tác cùng Tacticianclimb",
+    "subtitle": "Gửi thông tin để trở thành booster partner hoặc tổ chức giải đấu.",
+    "name": "Tên / Tổ chức",
+    "email": "Email",
+    "discord": "Discord",
+    "game": "Game",
+    "message": "Nhắn gì cho chúng tôi?",
+    "submit": "Gửi đơn đăng ký"
+  },
+  "gallery": {
+    "title": "Thành Tích & Hoạt Động",
+    "subtitle": "Screenshots thực tế từ gameplay, community, và quá trình phát triển"
+  }
+}

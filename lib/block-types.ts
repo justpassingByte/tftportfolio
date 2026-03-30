@@ -18,7 +18,12 @@ export type BlockType =
   | 'personal'
   | 'stats'
   | 'banner'
-  | 'faq';
+  | 'faq'
+  | 'about_avatar'
+  | 'comparison'
+  | 'proof'
+  | 'community'
+  | 'external';
 
 // ---- Per-block style settings ----------------------------
 export interface BlockStyle {
@@ -262,6 +267,70 @@ export const BLOCK_PALETTE: BlockMeta[] = [
     description: 'Vertical spacing',
     defaultContent: { height: 'md' },
     defaultStyle: { width: 'full', padding: 'none', marginY: 'none' },
+  },
+  {
+    type: 'about_avatar',
+    label: 'About & Avatar',
+    icon: '👤',
+    description: 'Personal bio with 3D avatar',
+    defaultContent: {
+      headline: 'Who am I?',
+      paragraphs: ['Top challenger player...'],
+      avatar_image: '',
+    },
+    defaultStyle: { width: 'wide', padding: 'lg' },
+  },
+  {
+    type: 'comparison',
+    label: 'Comparison',
+    icon: '⚖️',
+    description: 'Old way vs New way',
+    defaultContent: {
+      title: 'Current vs Past',
+      subtitle: '',
+      items: [
+        { feature: 'Speed', oldWay: 'Slow', newWay: 'Fast' }
+      ]
+    },
+    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+  },
+  {
+    type: 'proof',
+    label: 'Proof (TFT)',
+    icon: '🏆',
+    description: 'Verified match history elements',
+    defaultContent: {
+      title: 'Results',
+      subtitle: 'Recent games',
+    },
+    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+  },
+  {
+    type: 'community',
+    label: 'Community',
+    icon: '🌐',
+    description: 'Discord/Community spotlight',
+    defaultContent: {
+      title: 'Join Community',
+      subtitle: 'Talk with others',
+      image_src: '',
+      stats: [{ label: 'Members', value: '1K+' }],
+      cta_text: 'Join Discord',
+      cta_url: '#'
+    },
+    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
+  },
+  {
+    type: 'external',
+    label: 'External Links',
+    icon: '🔗',
+    description: 'Partner platforms',
+    defaultContent: {
+      title: 'Also found on',
+      subtitle: '',
+      platforms: [{ name: 'Twitch', url: '#', icon_url: '' }]
+    },
+    defaultStyle: { width: 'wide', padding: 'lg', textAlign: 'center' },
   },
 ];
 

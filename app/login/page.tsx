@@ -89,13 +89,6 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-xs text-slate-600 mt-6">
-          Want your own booster page?{' '}
-          <Link href="/apply" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">
-            Apply here
-          </Link>
-        </p>
       </div>
     </div>
   );

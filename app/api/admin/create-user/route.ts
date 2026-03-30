@@ -1,6 +1,28 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
+import { DEFAULT_BLOCK_STYLE } from '@/lib/block-types';
+import { ngusitinkSectionOrder, getNgusitinkSectionContent } from '@/lib/data';
+
+// Build the starter template blocks (matches the finalized homepage layout)
+function getStarterBlocks(displayName: string) {
+  return ngusitinkSectionOrder.map((type, index) => {
+    const rawContent = getNgusitinkSectionContent(type);
+    
+    // Inject custom display name into the hero avatar initial
+    let content = { ...rawContent };
+    if (type === 'hero' && typeof content.avatar_initial === 'string') {
+      content.avatar_initial = displayName.charAt(0).toUpperCase();
+    }
+    
+    return {
+      id: `tpl-${type}-${index}`,
+      type,
+      content,
+      style: { ...DEFAULT_BLOCK_STYLE, width: type === 'hero' ? 'full' : 'wide', padding: 'lg', textAlign: ['hero', 'comparison', 'why_me', 'reviews', 'community', 'external', 'links'].includes(type) ? 'center' : 'left' },
+    };
+  });
+}
 
 export async function POST(request: Request) {
   try {
@@ -55,7 +77,6 @@ export async function POST(request: Request) {
     });
 
     if (profileError) {
-      // Clean up: delete the auth user if profile creation fails
       await adminClient.auth.admin.deleteUser(userId);
       return NextResponse.json({ error: `Profile error: ${profileError.message}` }, { status: 500 });
     }
@@ -66,10 +87,13 @@ export async function POST(request: Request) {
       role: 'booster',
     });
 
-    // 4. Create default page
+    // 4. Create page with full starter template (same layout as homepage)
     await adminClient.from('booster_pages').insert({
       user_id: userId,
-      blocks: [],
+      template_id: 'default',
+      theme_config: { accentColor: '#6d28d9' },
+      blocks: getStarterBlocks(display_name),
+      blocks_en: [],
       is_published: true,
     });
 

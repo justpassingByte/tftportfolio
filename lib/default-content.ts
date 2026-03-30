@@ -7,18 +7,20 @@ import type {
   ExternalContent,
   ReviewItem,
   SectionType,
+  ComparisonContent,
 } from './types';
 
 // ============================================================
-// Default content — extracted from existing static components
+// Default content — the "ngusitink template" for all new pages
+// Boosters can customize any of these via the page builder
 // ============================================================
 
 export const defaultHeroContent: HeroContent = {
   headline: 'Consistent LP.',
   headline_highlight: 'No middleman.',
-  subheadline: 'Every game is played by me — no outsourcing, no randomness.',
-  trust_badges: ['Master+ level decision making', 'Fast response'],
-  avatar_initial: 'V',
+  subheadline: 'Every game is played by me — no outsourcing, no randomness. Part of the Tacticianclimb ecosystem.',
+  trust_badges: ['Verified Booster', 'Clean Gameplay', 'Fast Response'],
+  avatar_initial: 'B',
   cta_primary: 'Check availability',
   cta_secondary: 'Message me',
 };
@@ -75,6 +77,61 @@ export const defaultPersonalContent: PersonalContent = {
     "Every game you climb is played by me. That means consistent playstyle, same decision-making, and full accountability for your account's progress.",
     "My focus is on clean climbs. I play careful TFT — proper economy, flex comps, and adaptation to whatever lobby throws at me. No forcing meta, no coinflip plays.",
     "You get a high-level player who understands the game deeply and treats your account with the same care I'd treat my own.",
+  ],
+};
+
+// ---- About with Avatar (new default) --------------------
+export const defaultAboutAvatarContent = {
+  title: "What's Different",
+  paragraphs: [
+    "I don't run a boosting team. There's no rotating pool of accounts, no outsourcing, no randomness.",
+    "Every game you climb is played by me. Consistent playstyle, same decision-making, and full accountability.",
+    "My focus is on clean climbs — proper economy, flex comps, and adaptation. No forcing meta, no coinflip plays.",
+    "You get a high-level player who treats your account with the same care I'd treat my own.",
+  ],
+  avatarUrl: '/placeholder-user.jpg',
+  avatarAlt: 'Booster avatar',
+  highlights: [
+    { icon: '🎯', label: 'Role', value: 'TFT Booster' },
+    { icon: '🏆', label: 'Peak Rank', value: 'Master+' },
+    { icon: '🎮', label: 'Games', value: '500+ completed' },
+    { icon: '⚡', label: 'Response', value: 'Under 2 hours' },
+  ],
+};
+
+// ---- Comparison (new default) ----------------------------
+export const defaultComparisonContent: ComparisonContent = {
+  title: 'Why Tacticianclimb',
+  subtitle: 'Outdated boosting sites only take your money. We build something better.',
+  items: [
+    {
+      feature: 'PURPOSE',
+      oldWay: 'Extract money from players. No care about improvement or community.',
+      newWay: 'Build community, share knowledge, organize tournaments, and grow together.',
+    },
+    {
+      feature: 'SERVICES',
+      oldWay: 'One-dimensional rank boosting only. Same old model since 2012.',
+      newWay: 'Diverse ecosystem: Boosting, Coaching, Tournaments, and custom portfolio pages.',
+    },
+    {
+      feature: 'SECURITY & TRUST',
+      oldWay: 'Anonymous middlemen, high ban risk, fake accounts.',
+      newWay: '100% identity protection with full transparency between client and booster via Portfolio system.',
+    },
+  ],
+};
+
+// ---- Gallery (new default) ==============================
+export const defaultGalleryContent = {
+  title: 'Gallery',
+  subtitle: 'Real proof from real games — screenshots, ranks, results.',
+  images: [
+    { id: 'g1', src: '/gallery-1.png', caption: 'Winning board — Master lobby', category: 'Gameplay' },
+    { id: 'g2', src: '/gallery-2.png', caption: 'Diamond → Master promotion', category: 'Rank Climb' },
+    { id: 'g3', src: '/gallery-3.png', caption: 'Community Discord', category: 'Community' },
+    { id: 'g4', src: '/gallery-4.png', caption: 'LP winstreak', category: 'Gameplay' },
+    { id: 'g5', src: '/gallery-5.png', caption: 'Coaching session', category: 'Community' },
   ],
 };
 
@@ -183,24 +240,26 @@ export const defaultReviews: ReviewItem[] = [
 export const defaultCommunityContent: CommunityContent = {
   title: 'Community',
   description:
-    'If you want to learn, discuss TFT, or just hang out, feel free to join. Active community focused on high-level gameplay.',
+    'If you want to learn, discuss TFT, or just hang out, feel free to join. Active community focused on high-level gameplay and tournaments.',
   link_text: 'Join Discord',
   link_url: '#',
 };
 
 export const defaultExternalContent: ExternalContent = {
-  title: 'Daily Tournaments',
+  title: 'Create Your Own Portfolio',
   description:
-    'I also run TFT tournaments daily — from small games to larger events. Great way to test your skills against competitive players.',
-  link_text: 'Visit Testictour',
-  link_url: 'https://testictour.com',
+    'Every booster partner gets their own customizable profile page — showcase your results, gallery, reviews and build your personal brand on Tacticianclimb.',
+  link_text: 'Get Your Portfolio',
+  link_url: '#',
 };
 
-// Default section order for new pages
+// Default section order for new pages — full layout with all sections
 export const defaultSectionOrder: SectionType[] = [
   'hero',
+  'about_avatar',
+  'comparison',
   'proof',
-  'personal',
+  'gallery',
   'why_me',
   'reviews',
   'lead_form',

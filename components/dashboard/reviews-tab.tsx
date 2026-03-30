@@ -1,40 +1,78 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Trash2, Star } from 'lucide-react';
+import { Check, Trash2, Star, Loader2 } from 'lucide-react';
 import type { ReviewItem } from '@/lib/types';
-import { defaultReviews } from '@/lib/default-content';
+import { createClient } from '@/lib/supabase/client';
 
-export default function ReviewsTab() {
-  const [reviews, setReviews] = useState<ReviewItem[]>([
-    ...defaultReviews,
-    // Add a pending review for demo
-    {
-      id: 'pending-1',
-      username: 'NewReviewer',
-      rank_before: 'Plat 2',
-      rank_after: 'Diamond 3',
-      content: 'Just finished my climb, amazing experience! Super fast and professional.',
-      rating: 5,
-      is_approved: false,
-      created_at: new Date().toISOString(),
-    },
-  ]);
+interface ReviewsTabProps {
+  userId?: string;
+}
 
-  const approveReview = (id: string) => {
-    setReviews(
-      reviews.map((r) => (r.id === id ? { ...r, is_approved: true } : r))
-    );
+export default function ReviewsTab({ userId }: ReviewsTabProps) {
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadReviews();
+  }, [userId]);
+
+  const loadReviews = async () => {
+    setLoading(true);
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const boosterId = userId ?? user?.id;
+    if (!boosterId) { setLoading(false); return; }
+
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('booster_id', boosterId)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setReviews(data.map(r => ({
+        id: r.id,
+        username: r.username,
+        rank_before: r.rank_before ?? '',
+        rank_after: r.rank_after ?? '',
+        content: r.content ?? '',
+        rating: r.rating ?? 5,
+        is_approved: r.is_approved ?? false,
+        created_at: r.created_at,
+      })));
+    }
+    setLoading(false);
   };
 
-  const deleteReview = (id: string) => {
-    setReviews(reviews.filter((r) => r.id !== id));
+  const approveReview = async (id: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.from('reviews').update({ is_approved: true }).eq('id', id);
+    if (!error) {
+      setReviews(reviews.map((r) => (r.id === id ? { ...r, is_approved: true } : r)));
+    }
+  };
+
+  const deleteReview = async (id: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.from('reviews').delete().eq('id', id);
+    if (!error) {
+      setReviews(reviews.filter((r) => r.id !== id));
+    }
   };
 
   const pendingReviews = reviews.filter((r) => !r.is_approved);
   const approvedReviews = reviews.filter((r) => r.is_approved);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -49,6 +87,10 @@ export default function ReviewsTab() {
           </Badge>
         </div>
       </div>
+
+      <p className="text-slate-400 text-sm bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
+        💡 Khách hàng viết review từ trang profile công khai của bạn. Review mới sẽ hiện ở đây để bạn duyệt trước khi hiển thị.
+      </p>
 
       {/* Pending Reviews */}
       {pendingReviews.length > 0 && (
@@ -98,6 +140,9 @@ export default function ReviewsTab() {
       {/* Approved Reviews */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-green-300">Approved</h3>
+        {approvedReviews.length === 0 && (
+          <p className="text-slate-500 text-sm">Chưa có review nào được duyệt.</p>
+        )}
         {approvedReviews.map((review) => (
           <div
             key={review.id}
@@ -130,6 +175,13 @@ export default function ReviewsTab() {
           </div>
         ))}
       </div>
+
+      {reviews.length === 0 && (
+        <div className="text-center py-16">
+          <Star className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-400">Chưa có review nào. Chia sẻ trang profile để khách hàng viết review!</p>
+        </div>
+      )}
     </div>
   );
 }

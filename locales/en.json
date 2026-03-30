@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "about": "About",
+    "difference": "Difference",
+    "results": "Results",
+    "gallery": "Gallery",
+    "reviews": "Reviews",
+    "dashboard_login": "Dashboard Login"
+  },
+  "hero": {
+    "headline": "TFT Community & Tournaments.",
+    "headline_highlight": "Learn and compete.",
+    "subheadline": "More than boosting. I'm building a community where players connect, tournaments are organized, and boosters have a professional platform.",
+    "cta_primary": "Partner & Organize",
+    "cta_secondary": "Join Testictour",
+    "cta_tertiary": "Learn & Delegate Rank"
+  },
+  "about": {
+    "title": "Why I Do This",
+    "p1": "I'm ngusitink — the person behind Tacticianclimb. My goal is to create a hub dedicated to the TFT community.",
+    "p2": "This is a place for everyone to connect, learn, and especially a playground for organizing professional as well as community tournaments.",
+    "p3": "More importantly, this system provides each booster a unique profile. You can fully customize this page to your liking, turning it into a professional personal portfolio to attract clients.",
+    "p4": "Whether you're a booster wanting to build your personal brand, or a player wanting to join exciting tournaments, Tacticianclimb is for you."
+  },
+  "comparison": {
+    "title": "What Makes Us Different",
+    "subtitle": "Gone are the days of anonymous services that just take your money. Tacticianclimb puts the power back in your hands."
+  },
+  "why": {
+    "title": "Why Choose Tacticianclimb",
+    "subtitle": "Not just boosting — this is an ecosystem"
+  },
+  "reviews": {
+    "title": "What Players Say",
+    "subtitle": "Real feedback from real rank climbs"
+  },
+  "community": {
+    "title": "Connect & Tournaments",
+    "description": "Discord server is the community hub. Discuss meta, learn from high elo players, and sign up for regular tournaments.",
+    "cta": "Join Discord Server"
+  },
+  "external": {
+    "title": "Create Your Own Portfolio",
+    "description": "Every booster partner gets their own profile page. You can fully customize the layout, gallery, reviews to create an impressive portfolio.",
+    "cta": "Get Your Portfolio"
+  },
+  "lead_form": {
+    "title": "Interested?",
+    "subtitle": "If you don't have time to grind or want to watch a pro play to learn, hire me.",
+    "name": "Your name",
+    "rank": "Current rank",
+    "message": "Message",
+    "submit": "Send request"
+  },
+  "partner_form": {
+    "title": "Partner with Tacticianclimb",
+    "subtitle": "Send your info to become a booster partner or organize a tournament.",
+    "name": "Name / Organization",
+    "email": "Email",
+    "discord": "Discord",
+    "game": "Game",
+    "message": "What would you like to tell us?",
+    "submit": "Submit application"
+  },
+  "gallery": {
+    "title": "Achievements & Activities",
+    "subtitle": "Real screenshots from gameplay, community, and development"
+  }
+}

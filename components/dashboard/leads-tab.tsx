@@ -1,55 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, ArrowRight } from 'lucide-react';
+import { MessageSquare, ArrowRight, Loader2 } from 'lucide-react';
 import type { Lead } from '@/lib/types';
+import { createClient } from '@/lib/supabase/client';
 
-const MOCK_LEADS: Lead[] = [
-  {
-    id: '1',
-    booster_id: 'mock-1',
-    contact_info: 'Player#1234',
-    current_rank: 'Gold',
-    desired_rank: 'Platinum',
-    message: 'Looking for a smooth climb to Plat. Available anytime.',
-    status: 'new',
-    created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-  {
-    id: '2',
-    booster_id: 'mock-1',
-    contact_info: 'GamerDude#5678',
-    current_rank: 'Diamond',
-    desired_rank: 'Master',
-    message: 'Need Master before end of season. Budget flexible.',
-    status: 'new',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-  },
-  {
-    id: '3',
-    booster_id: 'mock-1',
-    contact_info: 'TFTFan#9999',
-    current_rank: 'Platinum',
-    desired_rank: 'Diamond',
-    message: 'Already talked on Discord, just filling the form.',
-    status: 'contacted',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-];
+interface LeadsTabProps {
+  userId?: string;
+}
 
-const STATUS_STYLES: Record<string, string> = {
-  new: 'bg-blue-600/20 text-blue-300 border-blue-500/30',
-  contacted: 'bg-yellow-600/20 text-yellow-300 border-yellow-500/30',
-  completed: 'bg-green-600/20 text-green-300 border-green-500/30',
-};
+export default function LeadsTab({ userId }: LeadsTabProps) {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function LeadsTab() {
-  const [leads, setLeads] = useState<Lead[]>(MOCK_LEADS);
+  useEffect(() => {
+    loadLeads();
+  }, [userId]);
 
-  const updateStatus = (id: string, newStatus: Lead['status']) => {
-    setLeads(leads.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+  const loadLeads = async () => {
+    setLoading(true);
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const boosterId = userId ?? user?.id;
+    if (!boosterId) { setLoading(false); return; }
+
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*')
+      .eq('booster_id', boosterId)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setLeads(data.map(l => ({
+        id: l.id,
+        booster_id: l.booster_id,
+        contact_info: l.contact_info,
+        current_rank: l.current_rank ?? '',
+        desired_rank: l.desired_rank ?? '',
+        message: l.message ?? '',
+        status: l.status ?? 'new',
+        created_at: l.created_at,
+      })));
+    }
+    setLoading(false);
+  };
+
+  const updateStatus = async (id: string, newStatus: Lead['status']) => {
+    const supabase = createClient();
+    const { error } = await supabase.from('leads').update({ status: newStatus }).eq('id', id);
+    if (!error) {
+      setLeads(leads.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+    }
   };
 
   const getTimeAgo = (dateString: string) => {
@@ -62,8 +65,22 @@ export default function LeadsTab() {
     return `${days}d ago`;
   };
 
+  const STATUS_STYLES: Record<string, string> = {
+    new: 'bg-blue-600/20 text-blue-300 border-blue-500/30',
+    contacted: 'bg-yellow-600/20 text-yellow-300 border-yellow-500/30',
+    completed: 'bg-green-600/20 text-green-300 border-green-500/30',
+  };
+
   const newLeads = leads.filter((l) => l.status === 'new');
   const otherLeads = leads.filter((l) => l.status !== 'new');
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -73,6 +90,10 @@ export default function LeadsTab() {
           {newLeads.length} New
         </Badge>
       </div>
+
+      <p className="text-slate-400 text-sm bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
+        💡 Khi khách hàng gửi form từ trang profile của bạn, lead sẽ xuất hiện ở đây. Bạn có thể theo dõi và cập nhật trạng thái.
+      </p>
 
       {/* New Leads */}
       {newLeads.length > 0 && (
@@ -160,7 +181,7 @@ export default function LeadsTab() {
       {leads.length === 0 && (
         <div className="text-center py-16">
           <MessageSquare className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-400">No leads yet. Share your page to start receiving messages!</p>
+          <p className="text-slate-400">Chưa có lead nào. Chia sẻ trang profile để bắt đầu nhận khách!</p>
         </div>
       )}
     </div>

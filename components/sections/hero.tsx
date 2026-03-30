@@ -7,11 +7,17 @@ import type { HeroContent } from '@/lib/types';
 
 interface HeroProps {
   content?: HeroContent;
-  onContactClick: () => void;
+  isBoosterProfile?: boolean;
+  onPrimaryClick: () => void;
+  onSecondaryClick: () => void;
+  onTertiaryClick: () => void;
 }
 
-export default function Hero({ content, onContactClick }: HeroProps) {
+export default function Hero({ content, isBoosterProfile = false, onPrimaryClick, onSecondaryClick, onTertiaryClick }: HeroProps) {
   const c = content ?? defaultHeroContent;
+
+  // For booster profiles: primary = "Uỷ thác" (opens lead form), secondary = "Join Testictour" (external link)
+  // For admin homepage: all 3 buttons as defined in content
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 pt-20 pb-20 relative overflow-hidden">
@@ -26,7 +32,11 @@ export default function Hero({ content, onContactClick }: HeroProps) {
         <div className="mb-12 flex justify-center">
           <div className="relative">
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-2 border-purple-500/30 overflow-hidden bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center">
-              <div className="text-6xl md:text-7xl">{c.avatar_initial ?? 'V'}</div>
+              {c.avatar_url ? (
+                <img src={c.avatar_url} alt="Profile Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-6xl md:text-7xl">{c.avatar_initial ?? 'V'}</div>
+              )}
             </div>
             {/* Glow ring */}
             <div className="absolute inset-0 rounded-full border-2 border-purple-400/20 blur-sm" />
@@ -59,22 +69,59 @@ export default function Hero({ content, onContactClick }: HeroProps) {
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            onClick={onContactClick}
-            size="lg"
-            className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-base h-12 px-8 border border-purple-500/50 shadow-lg shadow-purple-600/20"
-          >
-            {c.cta_primary ?? 'Check availability'}
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="bg-slate-800/50 hover:bg-slate-700 text-white rounded-lg text-base h-12 px-8 border-slate-600"
-          >
-            <MessageCircle className="w-5 h-5 mr-2" />
-            {c.cta_secondary ?? 'Message me'}
-          </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {isBoosterProfile ? (
+            <>
+              {/* Booster profile: 2 buttons only */}
+              <Button
+                onClick={onPrimaryClick}
+                size="lg"
+                className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-base h-12 px-8 border border-purple-500/50 shadow-lg shadow-purple-600/20"
+              >
+                Uỷ thác Rank cho tôi
+              </Button>
+              <Button
+                onClick={onSecondaryClick}
+                variant="outline"
+                size="lg"
+                className="bg-slate-800/50 hover:bg-slate-700 text-purple-300 rounded-lg text-base h-12 px-8 border-slate-700"
+              >
+                Join Testictour
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* Admin homepage: all 3 buttons */}
+              {c.cta_primary && (
+                <Button
+                  onClick={onPrimaryClick}
+                  size="lg"
+                  className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-base h-12 px-8 border border-purple-500/50 shadow-lg shadow-purple-600/20"
+                >
+                  {c.cta_primary}
+                </Button>
+              )}
+              {c.cta_tertiary && (
+                <Button
+                  onClick={onTertiaryClick}
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base h-12 px-8 border border-blue-500/50"
+                >
+                  {c.cta_tertiary}
+                </Button>
+              )}
+              {c.cta_secondary && (
+                <Button
+                  onClick={onSecondaryClick}
+                  variant="outline"
+                  size="lg"
+                  className="bg-slate-800/50 hover:bg-slate-700 text-purple-300 rounded-lg text-base h-12 px-8 border-slate-700"
+                >
+                  {c.cta_secondary}
+                </Button>
+              )}
+            </>
+          )}
         </div>
       </div>
     </section>

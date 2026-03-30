@@ -80,6 +80,7 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
           <Field label="Highlight" value={c.headline_highlight as string} onChange={(v) => update('headline_highlight', v)} />
           <Field label="Subheadline" value={c.subheadline as string} onChange={(v) => update('subheadline', v)} />
           <Field label="Avatar Letter" value={c.avatar_initial as string} onChange={(v) => update('avatar_initial', v)} />
+          <Field label="Avatar Image URL (Optional)" value={(c.avatar_url as string) ?? ''} onChange={(v) => update('avatar_url', v)} placeholder="https://..." />
           <Field label="CTA Primary" value={c.cta_primary as string} onChange={(v) => update('cta_primary', v)} />
           <Field label="CTA Secondary" value={c.cta_secondary as string} onChange={(v) => update('cta_secondary', v)} />
           <Field label="Background Image URL" value={(c.bg_image as string) ?? ''} onChange={(v) => update('bg_image', v)} placeholder="https://..." />
@@ -209,11 +210,144 @@ function ContentEditor({ block, content: c, update }: { block: Block; content: R
         </>
       )}
 
+      {block.type === 'reviews' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? 'What My Clients Say'} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? 'Real stories from real people who trusted me with their climb'} onChange={(v) => update('subtitle', v)} />
+          <Label className="text-slate-300 block text-xs mt-3">Reviews</Label>
+          {((c.reviews as { id: string; username: string; content: string; rank_before: string; rank_after: string; rating: number; days?: string }[]) ?? []).map((review, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <div className="flex gap-1.5">
+                <Input value={review.username} onChange={(e) => { const a = [...((c.reviews as any[]) ?? [])]; a[i] = { ...a[i], username: e.target.value }; update('reviews', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Username" />
+                <Input value={String(review.rating ?? 5)} onChange={(e) => { const a = [...((c.reviews as any[]) ?? [])]; a[i] = { ...a[i], rating: Math.min(5, Math.max(1, parseInt(e.target.value) || 5)) }; update('reviews', a); }} className="bg-slate-800 border-slate-700 text-white text-xs w-12" placeholder="★" type="number" />
+              </div>
+              <Textarea value={review.content} onChange={(e) => { const a = [...((c.reviews as any[]) ?? [])]; a[i] = { ...a[i], content: e.target.value }; update('reviews', a); }} className="bg-slate-800 border-slate-700 text-white text-xs resize-none" rows={2} placeholder="Review content..." />
+              <div className="flex gap-1.5">
+                <Input value={review.rank_before} onChange={(e) => { const a = [...((c.reviews as any[]) ?? [])]; a[i] = { ...a[i], rank_before: e.target.value }; update('reviews', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Rank before" />
+                <span className="text-slate-500 flex items-center text-xs">→</span>
+                <Input value={review.rank_after} onChange={(e) => { const a = [...((c.reviews as any[]) ?? [])]; a[i] = { ...a[i], rank_after: e.target.value }; update('reviews', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Rank after" />
+              </div>
+              <Input value={review.days ?? ''} onChange={(e) => { const a = [...((c.reviews as any[]) ?? [])]; a[i] = { ...a[i], days: e.target.value }; update('reviews', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Duration (e.g. 3 days)" />
+              <button onClick={() => { const a = [...((c.reviews as any[]) ?? [])]; a.splice(i, 1); update('reviews', a); }} className="text-red-400 hover:text-red-300 text-xs">Remove</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('reviews', [...((c.reviews as any[]) ?? []), { id: `r-${Date.now()}`, username: 'Player', content: 'Great service!', rank_before: 'Gold', rank_after: 'Diamond', rating: 5, days: '3 days', is_approved: true, created_at: new Date().toISOString() }])} label="review" />
+        </>
+      )}
+
       {block.type === 'lead_form' && <Field label="Button Text" value={(c.button_text as string) ?? 'Send message'} onChange={(v) => update('button_text', v)} />}
 
       {block.type === 'divider' && <SelectField label="Style" value={(c.style as string) ?? 'gradient'} options={['line', 'gradient', 'dots']} onChange={(v) => update('style', v)} />}
 
       {block.type === 'spacer' && <SelectField label="Height" value={(c.height as string) ?? 'md'} options={['sm', 'md', 'lg', 'xl']} onChange={(v) => update('height', v)} />}
+
+      {block.type === 'about_avatar' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Avatar Image URL" value={(c.avatarUrl as string) ?? ''} onChange={(v) => update('avatarUrl', v)} placeholder="https://..." />
+          <Field label="Avatar Alt Text" value={(c.avatarAlt as string) ?? ''} onChange={(v) => update('avatarAlt', v)} />
+          {((c.paragraphs as string[]) ?? ['']).map((p: string, i: number) => (
+            <div key={i} className="flex gap-1">
+              <Textarea value={p} onChange={(e) => { const a = [...((c.paragraphs as string[]) ?? [''])]; a[i] = e.target.value; update('paragraphs', a); }} className="bg-slate-800 border-slate-700 text-white text-sm resize-none flex-1" rows={2} />
+              <button onClick={() => { const a = [...((c.paragraphs as string[]) ?? [])]; a.splice(i, 1); update('paragraphs', a); }} className="text-red-400 hover:text-red-300 px-1 text-xs">✕</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('paragraphs', [...((c.paragraphs as string[]) ?? []), ''])} label="paragraph" />
+          <Label className="text-slate-300 block text-xs mt-3">Highlights</Label>
+          {((c.highlights as { icon: string; label: string; value: string }[]) ?? []).map((h, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <div className="flex gap-1.5">
+                <Input value={h.icon} onChange={(e) => { const a = [...((c.highlights as { icon: string; label: string; value: string }[]) ?? [])]; a[i] = { ...a[i], icon: e.target.value }; update('highlights', a); }} className="bg-slate-800 border-slate-700 text-white text-xs w-12" />
+                <Input value={h.label} onChange={(e) => { const a = [...((c.highlights as { icon: string; label: string; value: string }[]) ?? [])]; a[i] = { ...a[i], label: e.target.value }; update('highlights', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Label" />
+                <Input value={h.value} onChange={(e) => { const a = [...((c.highlights as { icon: string; label: string; value: string }[]) ?? [])]; a[i] = { ...a[i], value: e.target.value }; update('highlights', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Value" />
+              </div>
+              <button onClick={() => { const a = [...((c.highlights as { icon: string; label: string; value: string }[]) ?? [])]; a.splice(i, 1); update('highlights', a); }} className="text-red-400 hover:text-red-300 text-xs">Remove</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('highlights', [...((c.highlights as { icon: string; label: string; value: string }[]) ?? []), { icon: '⚡', label: 'Label', value: 'Value' }])} label="highlight" />
+        </>
+      )}
+
+      {block.type === 'comparison' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Label className="text-slate-300 block text-xs mt-2">Comparison Items</Label>
+          {((c.items as { feature: string; oldWay: string; newWay: string }[]) ?? []).map((item, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <Input value={item.feature} onChange={(e) => { const a = [...((c.items as { feature: string; oldWay: string; newWay: string }[]) ?? [])]; a[i] = { ...a[i], feature: e.target.value }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Feature name" />
+              <Textarea value={item.oldWay} onChange={(e) => { const a = [...((c.items as { feature: string; oldWay: string; newWay: string }[]) ?? [])]; a[i] = { ...a[i], oldWay: e.target.value }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs resize-none" rows={1} placeholder="Old way..." />
+              <Textarea value={item.newWay} onChange={(e) => { const a = [...((c.items as { feature: string; oldWay: string; newWay: string }[]) ?? [])]; a[i] = { ...a[i], newWay: e.target.value }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs resize-none" rows={1} placeholder="New way..." />
+              <button onClick={() => { const a = [...((c.items as { feature: string; oldWay: string; newWay: string }[]) ?? [])]; a.splice(i, 1); update('items', a); }} className="text-red-400 hover:text-red-300 text-xs">Remove</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('items', [...((c.items as { feature: string; oldWay: string; newWay: string }[]) ?? []), { feature: '', oldWay: '', newWay: '' }])} label="comparison" />
+        </>
+      )}
+
+      {block.type === 'proof' && (
+        <>
+          <Field label="Section Title" value={(c.title as string) ?? 'Results That Speak'} onChange={(v) => update('title', v)} />
+          <Field label="Section Subtitle" value={(c.subtitle as string) ?? 'Real climbs. Real gameplay.'} onChange={(v) => update('subtitle', v)} />
+          <Label className="text-slate-300 block text-xs mt-3">Proof Items</Label>
+          {((c.items as { id: string; title: string; description: string; tags: string[]; size?: string; images?: string[] }[]) ?? []).map((item, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <Input value={item.title} onChange={(e) => { const a = [...((c.items as any[]) ?? [])]; a[i] = { ...a[i], title: e.target.value }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Title (e.g. Diamond → Master)" />
+              <Textarea value={item.description} onChange={(e) => { const a = [...((c.items as any[]) ?? [])]; a[i] = { ...a[i], description: e.target.value }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs resize-none" rows={2} placeholder="Description..." />
+              <Input value={(item.tags ?? []).join(', ')} onChange={(e) => { const a = [...((c.items as any[]) ?? [])]; a[i] = { ...a[i], tags: e.target.value.split(',').map((t: string) => t.trim()).filter(Boolean) }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Tags (comma separated)" />
+              <SelectField label="Size" value={item.size ?? 'small'} options={['small', 'medium', 'large']} onChange={(v) => { const a = [...((c.items as any[]) ?? [])]; a[i] = { ...a[i], size: v }; update('items', a); }} />
+              
+              <Label className="text-slate-400 block text-[10px] mt-1">Images (URLs)</Label>
+              {(item.images ?? []).map((img: string, imgIdx: number) => (
+                <div key={imgIdx} className="flex gap-1">
+                  <Input value={img} onChange={(e) => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? [])]; imgs[imgIdx] = e.target.value; a[i] = { ...a[i], images: imgs }; update('items', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="https://..." />
+                  <button onClick={() => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? [])]; imgs.splice(imgIdx, 1); a[i] = { ...a[i], images: imgs }; update('items', a); }} className="text-red-400 hover:text-red-300 px-1 text-xs">✕</button>
+                </div>
+              ))}
+              <button onClick={() => { const a = [...((c.items as any[]) ?? [])]; const imgs = [...(a[i].images ?? []), '']; a[i] = { ...a[i], images: imgs }; update('items', a); }} className="text-purple-400 hover:text-purple-300 text-xs">+ Add image</button>
+
+              <button onClick={() => { const a = [...((c.items as any[]) ?? [])]; a.splice(i, 1); update('items', a); }} className="text-red-400 hover:text-red-300 text-xs block mt-1">Remove item</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('items', [...((c.items as any[]) ?? []), { id: `proof-${Date.now()}`, title: 'New Result', description: 'Describe the climb...', tags: ['TFT'], size: 'small', images: [] }])} label="proof item" />
+        </>
+      )}
+
+      {block.type === 'community' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Field label="Image URL" value={(c.image_src as string) ?? ''} onChange={(v) => update('image_src', v)} placeholder="https://..." />
+          <Field label="CTA Text" value={(c.cta_text as string) ?? 'Join Discord'} onChange={(v) => update('cta_text', v)} />
+          <Field label="CTA URL" value={(c.cta_url as string) ?? '#'} onChange={(v) => update('cta_url', v)} />
+          <Label className="text-slate-300 block text-xs mt-2">Stats</Label>
+          {((c.stats as { label: string; value: string }[]) ?? []).map((s, i) => (
+            <div key={i} className="flex gap-1.5">
+              <Input value={s.value} onChange={(e) => { const a = [...((c.stats as { label: string; value: string }[]) ?? [])]; a[i] = { ...a[i], value: e.target.value }; update('stats', a); }} className="bg-slate-800 border-slate-700 text-white text-xs w-20" placeholder="1K+" />
+              <Input value={s.label} onChange={(e) => { const a = [...((c.stats as { label: string; value: string }[]) ?? [])]; a[i] = { ...a[i], label: e.target.value }; update('stats', a); }} className="bg-slate-800 border-slate-700 text-white text-xs flex-1" placeholder="Members" />
+              <button onClick={() => { const a = [...((c.stats as { label: string; value: string }[]) ?? [])]; a.splice(i, 1); update('stats', a); }} className="text-red-400 hover:text-red-300 px-1 text-xs">✕</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('stats', [...((c.stats as { label: string; value: string }[]) ?? []), { label: 'Label', value: '0' }])} label="stat" />
+        </>
+      )}
+
+      {block.type === 'external' && (
+        <>
+          <Field label="Title" value={(c.title as string) ?? ''} onChange={(v) => update('title', v)} />
+          <Field label="Subtitle" value={(c.subtitle as string) ?? ''} onChange={(v) => update('subtitle', v)} />
+          <Label className="text-slate-300 block text-xs mt-2">Platforms</Label>
+          {((c.platforms as { name: string; url: string; icon_url: string }[]) ?? []).map((p, i) => (
+            <div key={i} className="bg-slate-800/50 rounded-lg p-2.5 space-y-1.5 border border-slate-700/50">
+              <Input value={p.name} onChange={(e) => { const a = [...((c.platforms as { name: string; url: string; icon_url: string }[]) ?? [])]; a[i] = { ...a[i], name: e.target.value }; update('platforms', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Platform name" />
+              <Input value={p.url} onChange={(e) => { const a = [...((c.platforms as { name: string; url: string; icon_url: string }[]) ?? [])]; a[i] = { ...a[i], url: e.target.value }; update('platforms', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="URL" />
+              <Input value={p.icon_url} onChange={(e) => { const a = [...((c.platforms as { name: string; url: string; icon_url: string }[]) ?? [])]; a[i] = { ...a[i], icon_url: e.target.value }; update('platforms', a); }} className="bg-slate-800 border-slate-700 text-white text-xs" placeholder="Icon URL (optional)" />
+              <button onClick={() => { const a = [...((c.platforms as { name: string; url: string; icon_url: string }[]) ?? [])]; a.splice(i, 1); update('platforms', a); }} className="text-red-400 hover:text-red-300 text-xs">Remove</button>
+            </div>
+          ))}
+          <AddBtn onClick={() => update('platforms', [...((c.platforms as { name: string; url: string; icon_url: string }[]) ?? []), { name: 'Platform', url: '#', icon_url: '' }])} label="platform" />
+        </>
+      )}
     </>
   );
 }
