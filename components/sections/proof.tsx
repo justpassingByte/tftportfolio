@@ -8,9 +8,11 @@ import type { ProofItem } from '@/lib/types';
 
 interface ProofSectionProps {
   items?: ProofItem[];
+  title?: string;
+  subtitle?: string;
 }
 
-export default function ProofSection({ items }: ProofSectionProps) {
+export default function ProofSection({ items, title, subtitle }: ProofSectionProps) {
   const proofItems = items ?? [];
   const [selectedItem, setSelectedItem] = useState<ProofItem | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -53,10 +55,10 @@ export default function ProofSection({ items }: ProofSectionProps) {
     <section className="py-24 px-4 bg-gradient-to-b from-slate-950 to-slate-900/50 relative">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center">
-          Results That Speak
+          {title || 'Results That Speak'}
         </h2>
         <p className="text-slate-400 text-center mb-16 max-w-2xl mx-auto">
-          Real climbs. Real gameplay. Every game played solo.
+          {subtitle || 'Real climbs. Real gameplay. Every game played solo.'}
         </p>
 
         {proofItems.length === 0 ? (

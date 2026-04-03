@@ -281,7 +281,7 @@ export default function BlockRenderer({ block, accentColor = '#6d28d9' }: BlockR
       );
 
     case 'proof':
-      return inner(<ProofSection />); // Assuming ProofSection handles its own DB fetches or internal props
+      return inner(<ProofSection items={c.items as any[]} title={c.title as string} subtitle={c.subtitle as string} />);
 
     case 'community':
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

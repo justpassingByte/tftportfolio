@@ -82,6 +82,8 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
           <ProofSection
             key="proof"
             items={(content as { items?: ProofItem[] }).items ?? data.proof_items}
+            title={(content as { title?: string }).title}
+            subtitle={(content as { subtitle?: string }).subtitle}
           />
         );
       case 'personal':
@@ -187,6 +189,8 @@ export default function TemplateRenderer({ data, isAdmin = false }: TemplateRend
           <ProofSection
             key={block.id}
             items={finalItems}
+            title={(content as { title?: string }).title}
+            subtitle={(content as { subtitle?: string }).subtitle}
           />
         );
       }

@@ -416,8 +416,91 @@ export default function DashboardPage() {
   }, [blocks, selectedBlockId, setBlocks]);
 
   const updateBlockContent = useCallback((blockId: string, content: Record<string, unknown>) => {
+    // 1. Cập nhật block hiện tại
     setBlocks((prev) => prev.map((b) => (b.id === blockId ? { ...b, content } : b)));
-  }, [setBlocks]);
+    
+    // 2. Đồng bộ các field media (ảnh) sang ngôn ngữ khác để user không cần upload 2 lần
+    setBlockData((allData) => {
+      const otherLang = editLang === 'vi' ? 'en' : 'vi';
+      const otherBlocks = allData[otherLang];
+      if (!otherBlocks || otherBlocks.length === 0) return allData;
+
+      const otherBlockIndex = otherBlocks.findIndex(b => b.id === blockId);
+      if (otherBlockIndex === -1) return allData;
+
+      const updatedOtherBlock = { ...otherBlocks[otherBlockIndex] };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const currentContent = { ...updatedOtherBlock.content } as Record<string, any>;
+      let hasChanges = false;
+
+      // Hàm đồng bộ field cấp 1
+      const syncField = (key: string) => {
+        if (content[key] !== undefined && JSON.stringify(content[key]) !== JSON.stringify(currentContent[key])) {
+          currentContent[key] = content[key];
+          hasChanges = true;
+        }
+      };
+
+      // Hàm đồng bộ trong mảng đối tượng
+      const syncObjArrayImages = (key: string, itemKeys: string[]) => {
+        if (content[key] && Array.isArray(content[key])) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const incomingArr = content[key] as any[];
+          if (currentContent[key] && Array.isArray(currentContent[key])) {
+            incomingArr.forEach((incomingItem, i) => {
+              if (currentContent[key][i]) {
+                itemKeys.forEach(k => {
+                  if (JSON.stringify(incomingItem[k]) !== JSON.stringify(currentContent[key][i][k])) {
+                    currentContent[key][i] = { ...currentContent[key][i], [k]: incomingItem[k] };
+                    hasChanges = true;
+                  }
+                });
+              }
+            });
+          }
+        }
+      };
+
+      switch (updatedOtherBlock.type) {
+        case 'hero':
+        case 'community':
+          syncField('bg_image');
+          syncField('image_src');
+          break;
+        case 'image':
+          syncField('src');
+          break;
+        case 'gallery':
+          syncField('images');
+          break;
+        case 'proof':
+          syncObjArrayImages('items', ['images', 'image_url']);
+          break;
+        case 'about_avatar':
+          syncField('avatarUrl');
+          syncField('secondaryImageUrl');
+          break;
+        case 'donation':
+          syncObjArrayImages('methods', ['qr_url']);
+          break;
+        case 'video':
+          syncField('video_url');
+          syncField('thumbnail_url');
+          break;
+      }
+
+      if (!hasChanges) return allData;
+
+      updatedOtherBlock.content = currentContent;
+      const nextOtherBlocks = [...otherBlocks];
+      nextOtherBlocks[otherBlockIndex] = updatedOtherBlock;
+
+      return {
+        ...allData,
+        [otherLang]: nextOtherBlocks
+      };
+    });
+  }, [setBlocks, editLang]);
 
   const updateBlockStyle = useCallback((blockId: string, style: BlockStyle) => {
     setBlocks((prev) => prev.map((b) => (b.id === blockId ? { ...b, style } : b)));
