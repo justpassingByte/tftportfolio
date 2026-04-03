@@ -17,6 +17,10 @@ export function ImageUpload({ value, onChange, placeholder = 'Upload or paste im
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const onChangeRef = useRef(onChange);
+
+  // Keep the ref updated with the latest callback
+  onChangeRef.current = onChange;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,7 +56,8 @@ export function ImageUpload({ value, onChange, placeholder = 'Upload or paste im
         .from(bucket)
         .getPublicUrl(filePath);
 
-      onChange(publicUrl);
+      // Use the latest onChange callback from the ref
+      onChangeRef.current(publicUrl);
     } catch (err: any) {
       console.error('Upload error:', err);
       setError(err.message || 'Failed to upload image. Make sure the storage bucket exists.');

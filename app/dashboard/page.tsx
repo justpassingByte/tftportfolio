@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Palette, Eye, Save, Home, X, Brush, Star, MessageSquare, Settings2, ExternalLink, LogOut, Shield, Users, FileText, Plus, Trash2 } from 'lucide-react';
+import { Palette, Eye, Save, Home, X, Brush, Star, MessageSquare, Settings2, ExternalLink, LogOut, Shield, Users, FileText, Plus, Trash2, Check } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,6 +96,10 @@ interface BoosterUser {
 function AdminApplicationsTab() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [acceptingApp, setAcceptingApp] = useState<Application | null>(null);
+  const [acceptForm, setAcceptForm] = useState({ username: '', password: '' });
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [acceptError, setAcceptError] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -111,6 +115,32 @@ function AdminApplicationsTab() {
     const supabase = createClient();
     await supabase.from('booster_applications').update({ status: 'rejected' }).eq('id', id);
     setApplications((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'rejected' } : a)));
+  };
+
+  const handleAcceptSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!acceptingApp) return;
+    setAcceptError('');
+    setAcceptLoading(true);
+    try {
+      const res = await fetch('/api/admin/create-user', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: acceptingApp.email, display_name: acceptingApp.display_name, username: acceptForm.username, password: acceptForm.password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      
+      const supabase = createClient();
+      await supabase.from('booster_applications').update({ status: 'approved' }).eq('id', acceptingApp.id);
+      
+      setApplications((prev) => prev.map((a) => (a.id === acceptingApp.id ? { ...a, status: 'approved' } : a)));
+      setAcceptingApp(null);
+      setAcceptForm({ username: '', password: '' });
+    } catch (err) {
+      setAcceptError(err instanceof Error ? err.message : 'Error accepting');
+    } finally {
+      setAcceptLoading(false);
+    }
   };
 
   const pendingApps = applications.filter((a) => a.status === 'pending');
@@ -135,9 +165,31 @@ function AdminApplicationsTab() {
                 <Badge className="bg-slate-700 text-slate-300 text-xs">{app.game}</Badge>
               </div>
               {app.message && <p className="text-sm text-slate-300 bg-slate-900/50 rounded px-4 py-3 mb-4">{app.message}</p>}
-              <Button size="sm" variant="ghost" onClick={() => rejectApplication(app.id)} className="text-red-400 hover:text-red-300 h-8 text-xs">
-                <X className="w-3.5 h-3.5 mr-1" /> Reject
-              </Button>
+              {acceptingApp?.id === app.id ? (
+                <div className="mt-4 bg-slate-950/50 border border-slate-800 rounded-lg p-3">
+                  <p className="text-sm font-medium text-slate-300 mb-2">Create Booster Account</p>
+                  <form onSubmit={handleAcceptSubmit} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label className="text-slate-400 text-xs mb-1 block">Username *</Label><Input value={acceptForm.username} onChange={(e) => setAcceptForm({ ...acceptForm, username: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })} required placeholder="e.g. jondoe" className="bg-slate-900 border-slate-700 text-white text-sm h-8" /></div>
+                      <div><Label className="text-slate-400 text-xs mb-1 block">Password *</Label><Input type="password" value={acceptForm.password} onChange={(e) => setAcceptForm({ ...acceptForm, password: e.target.value })} required className="bg-slate-900 border-slate-700 text-white text-sm h-8" /></div>
+                    </div>
+                    {acceptError && <p className="text-red-400 text-xs bg-red-900/20 px-2 py-1 rounded border border-red-500/20">{acceptError}</p>}
+                    <div className="flex gap-2">
+                      <Button type="submit" disabled={acceptLoading} size="sm" className="bg-green-600 hover:bg-green-700 text-white h-7 text-xs">{acceptLoading ? 'Creating...' : 'Create Account & Approve'}</Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => { setAcceptingApp(null); setAcceptForm({username: '', password: ''}) }} className="text-slate-400 h-7 text-xs">Cancel</Button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => setAcceptingApp(app)} className="text-green-400 hover:text-green-300 h-8 text-xs bg-green-900/20">
+                    <Check className="w-3.5 h-3.5 mr-1" /> Accept
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => rejectApplication(app.id)} className="text-red-400 hover:text-red-300 h-8 text-xs bg-red-900/20">
+                    <X className="w-3.5 h-3.5 mr-1" /> Reject
+                  </Button>
+                </div>
+              )}
             </div>
           ))}
         </div>
