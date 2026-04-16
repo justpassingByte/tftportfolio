@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
     try {
       const supabase = createClient();
       const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`,
+        redirectTo: `https://tftportfolio.vercel.app/update-password`,
       });
 
       if (authError) {
